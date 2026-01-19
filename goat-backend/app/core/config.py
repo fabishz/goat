@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
+    # Environment
+    ENVIRONMENT: str = "production"
+    DEBUG: bool = False
+    LOG_LEVEL: str = "INFO"
+
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: str | List[str]) -> List[str] | str:
