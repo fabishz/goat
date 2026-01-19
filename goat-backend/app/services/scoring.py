@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.scoring import ScoringModel, ScoringComponent, ScoringWeight, RawScore, FinalScore, RankingSnapshot
 from app.models.expert import ExpertVote, ExpertScoreContribution, Expert
 from app.models.fan_voting import FanVoteAggregate
+from app.models.era import EraFactor
 from app.models.entity import Entity
 
 
@@ -28,17 +29,31 @@ class ScoringService:
             
         return max(0.0, min(1.0, normalized))
 
-    def calculate_era_adjustment(self, db: Session, component_id: UUID, era_id: str, value: float) -> float:
+    def calculate_era_adjustment(self, db: Session, component_id: UUID, era_id: UUID, value: float) -> float:
         """
         Adjusts a score relative to the era average to ensure cross-generational fairness.
+        Uses EraFactor mean if available, otherwise falls back to database average.
         """
-        avg_query = select(func.avg(RawScore.value)).where(
-            RawScore.component_id == component_id,
-            RawScore.era_id == era_id
-        )
-        era_avg = db.execute(avg_query).scalar() or 1.0
+        # Try to get pre-calculated era factor
+        factor = db.execute(
+            select(EraFactor).where(
+                and_(
+                    EraFactor.era_id == era_id,
+                    EraFactor.component_id == component_id
+                )
+            )
+        ).scalar_one_or_none()
+
+        if factor and factor.mean_value > 0:
+            era_avg = factor.mean_value
+        else:
+            avg_query = select(func.avg(RawScore.value)).where(
+                RawScore.component_id == component_id,
+                RawScore.era_id == era_id
+            )
+            era_avg = db.execute(avg_query).scalar() or 1.0
         
-        # Relative performance: how much better than the era average was this entity?
+        # Dominance factor: how much better than the era average was this entity?
         return value / era_avg
 
     def run_scoring_for_category(self, db: Session, category_id: UUID, model_id: Optional[UUID] = None) -> List[FinalScore]:
@@ -89,26 +104,42 @@ class ScoringService:
                     breakdown[component.slug] = 0.0
                     continue
 
-                raw_value = raw_score_obj.value
-                
-                # Apply Era Adjustment if era_id is present
-                if raw_score_obj.era_id:
-                    adjusted_value = self.calculate_era_adjustment(db, component.id, raw_score_obj.era_id, raw_value)
-                    explanations.append(f"{component.name}: Era adjusted from {raw_value} to {adjusted_value:.2f}")
-                    raw_value = adjusted_value
+                # Initialize value with the raw score's value
+                value = raw_score_obj.value
 
-                # Get min/max for normalization across all entities for this component
+                # 1. Get min/max for normalization across all entities for this component
                 stats_query = select(func.min(RawScore.value), func.max(RawScore.value)).where(
                     RawScore.component_id == component.id
                 )
                 min_val, max_val = db.execute(stats_query).one()
                 
                 normalized_val = self.normalize_value(
-                    raw_value, 
+                    value, 
                     min_val or 0.0, 
                     max_val or 1.0, 
                     method=component.normalization_type
                 )
+
+                # 2. Apply Era Adjustments (as modifiers to normalized score)
+                if raw_score_obj.era_id:
+                    era_factor = db.execute(
+                        select(EraFactor).where(
+                            and_(
+                                EraFactor.era_id == raw_score_obj.era_id,
+                                EraFactor.component_id == component.id
+                            )
+                        )
+                    ).scalar_one_or_none()
+                    
+                    if era_factor:
+                        # Apply era-specific multiplier (contextual difficulty)
+                        normalized_val = normalized_val * era_factor.multiplier
+                        explanations.append(f"{component.name}: Era multiplier {era_factor.multiplier} applied")
+                    
+                    # Apply dominance factor (relative to era average)
+                    dominance_factor = self.calculate_era_adjustment(db, component.id, raw_score_obj.era_id, raw_score_obj.value)
+                    normalized_val = normalized_val * dominance_factor
+                    explanations.append(f"{component.name}: Era dominance factor {dominance_factor:.2f} applied")
                 
                 # Popularity Cap: If subjective and exceeds 10% of total weight, cap it
                 # (This is a simplified implementation of the cap)

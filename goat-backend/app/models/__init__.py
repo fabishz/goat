@@ -33,6 +33,14 @@ from app.models.fan_voting import (
     VoteAnomaly
 )
 
+from app.models.era import (
+    Era,
+    EraModel,
+    EraFactor,
+    EraAdjustedScore,
+    EraAuditLog
+)
+
 __all__ = [
     "Base",
     "Category",
@@ -59,4 +67,9 @@ __all__ = [
     "FanVoteVersion",
     "FanVoteAggregate",
     "VoteAnomaly",
+    "Era",
+    "EraModel",
+    "EraFactor",
+    "EraAdjustedScore",
+    "EraAuditLog",
 ]
