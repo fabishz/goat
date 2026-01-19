@@ -1,7 +1,7 @@
 import math
 from typing import List, Dict, Any, Optional
 from uuid import UUID
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_
 from sqlalchemy.orm import Session
 from app.models.scoring import ScoringModel, ScoringComponent, ScoringWeight, RawScore, FinalScore, RankingSnapshot
 from app.models.expert import ExpertVote, ExpertScoreContribution, Expert
