@@ -41,8 +41,8 @@ The **GOAT (Greatest of All Time) Ranking Engine** is a sophisticated, mathemati
 ### Installation
 1. **Clone the repository**
    ```bash
-   git clone <repo-url>
-   cd goat-backend
+   git clone https://github.com/fabishz/goat.git
+   cd goat
    ```
 
 2. **Create Virtual Environment**
