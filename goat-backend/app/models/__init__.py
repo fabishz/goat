@@ -5,6 +5,15 @@ from app.models.entity import Entity
 from app.models.achievement import Achievement
 from app.models.award import Award
 
+from app.models.scoring import (
+    ScoringModel, 
+    ScoringComponent, 
+    ScoringWeight, 
+    RawScore, 
+    FinalScore, 
+    RankingSnapshot
+)
+
 __all__ = [
     "Base",
     "Category",
@@ -12,4 +21,10 @@ __all__ = [
     "Entity",
     "Achievement",
     "Award",
+    "ScoringModel",
+    "ScoringComponent",
+    "ScoringWeight",
+    "RawScore",
+    "FinalScore",
+    "RankingSnapshot",
 ]
