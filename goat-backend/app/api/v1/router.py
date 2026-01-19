@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.routes import health, categories, subcategories, entities, scoring, experts
+from app.api.v1.routes import health, categories, subcategories, entities, scoring, experts, fan_votes
 
 api_router = APIRouter()
 

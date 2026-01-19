@@ -5,6 +5,7 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.orm import Session
 from app.models.scoring import ScoringModel, ScoringComponent, ScoringWeight, RawScore, FinalScore, RankingSnapshot
 from app.models.expert import ExpertVote, ExpertScoreContribution, Expert
+from app.models.fan_voting import FanVoteAggregate
 from app.models.entity import Entity
 
 
@@ -150,7 +151,24 @@ class ScoringService:
                     breakdown["expert_influence"] = round(avg_expert_score * expert_influence_weight, 2)
                     explanations.append(f"Expert Influence: {len(expert_votes)} votes aggregated (20% weight)")
 
-            # 5. Save Final Score
+            # 5. Integrate Fan Votes
+            fan_aggregate_query = select(FanVoteAggregate).where(
+                and_(
+                    FanVoteAggregate.entity_id == entity.id,
+                    FanVoteAggregate.category_id == category_id
+                )
+            )
+            fan_aggregate = db.execute(fan_aggregate_query).scalar_one_or_none()
+            
+            if fan_aggregate:
+                # Fan influence is capped at 10% of the final score
+                fan_influence_weight = 0.1
+                total_score = (total_score * (1 - fan_influence_weight)) + (fan_aggregate.aggregate_score * fan_influence_weight)
+                
+                breakdown["fan_sentiment"] = round(fan_aggregate.aggregate_score * fan_influence_weight, 2)
+                explanations.append(f"Fan Sentiment: {fan_aggregate.vote_count} votes aggregated (10% weight)")
+
+            # 6. Save Final Score
             final_score = FinalScore(
                 entity_id=entity.id,
                 scoring_model_id=model.id,
