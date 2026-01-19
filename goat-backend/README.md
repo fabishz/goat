@@ -25,6 +25,12 @@ The **GOAT (Greatest of All Time) Ranking Engine** is a sophisticated, mathemati
 - **Anti-Abuse**: Automated surge detection, outlier down-weighting, and bot protection.
 - **Capped Impact**: Fan sentiment is capped at 10% to prevent popularity contests from overriding objective data.
 
+### 5. 🤖 AI Influence Analysis
+- **Evidence-Based**: Influence is measured by counting verified "Influence Events" (citations, peer mentions, rule changes).
+- **Multi-Dimensional**: Scores are based on Breadth (cross-domain), Depth (citations), Longevity (time span), and Peer Acknowledgment.
+- **Transparent**: No black-box scoring; every point is traceable to a source.
+- **Capped Impact**: Influence is capped at 15% of the final score.
+
 ## Tech Stack
 - **Framework**: FastAPI (Python 3.10+)
 - **Database**: PostgreSQL (Neon) with SQLAlchemy 2.0 (Async/Sync)
@@ -82,6 +88,7 @@ Once running, visit `http://localhost:8000/docs` for the interactive Swagger UI.
 - **Eras**: `/api/v1/eras` - Manage historical eras and context factors.
 - **Experts**: `/api/v1/experts` - Expert management and voting.
 - **Fan Votes**: `/api/v1/fan-votes` - Secure fan voting endpoints.
+- **Influence**: `/api/v1/influence` - Manage influence sources, events, and models.
 
 ## Scoring Methodology
 The final GOAT score is calculated as follows:
@@ -94,6 +101,7 @@ The final GOAT score is calculated as follows:
 4. **Weighting**: Component weights are applied (e.g., "Championships" = 40%).
 5. **Expert Integration**: Weighted expert consensus is added (max 20%).
 6. **Fan Integration**: Weighted fan sentiment is added (max 10%).
+7. **AI Influence**: Verified influence score is added (max 15%).
 
 ## Verification
 Run the included verification scripts to test core subsystems:
@@ -102,6 +110,20 @@ python verify_scoring.py   # Test core scoring engine
 python verify_experts.py   # Test expert voting
 python verify_fan_votes.py # Test fan voting & anti-abuse
 python verify_eras.py      # Test era normalization
+python verify_influence.py # Test AI influence analysis
+```
+
+## Testing
+The project includes a comprehensive test suite using `pytest`.
+
+```bash
+# Run all tests
+./venv/bin/python -m pytest
+
+# Run specific test category
+./venv/bin/python -m pytest tests/unit
+./venv/bin/python -m pytest tests/integration
+./venv/bin/python -m pytest tests/e2e
 ```
 
 ---
