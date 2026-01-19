@@ -2,14 +2,47 @@ import requests
 import uuid
 import time
 import json
+import sys
 
 BASE_URL = "http://localhost:8001/api/v1"
 
-def test_expert_system():
-    print("Starting Expert System Verification...")
+def create_user_and_login(email: str, role: str = "expert"):
+    # 1. Register
+    try:
+        requests.post(f"{BASE_URL}/users/", json={
+            "email": email,
+            "password": "password123",
+            "full_name": "Test Expert",
+            "role": role
+        })
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 409: # Assuming 409 for conflict (user exists)
+            pass # User might exist
+        else:
+            raise # Re-raise other errors
+    except Exception:
+        pass # User might exist
+
+    # 2. Login
+    response = requests.post(f"{BASE_URL}/login/access-token", data={
+        "username": email,
+        "password": "password123"
+    })
+    if response.status_code != 200:
+        print(f"Login failed: {response.text}")
+        sys.exit(1)
+    
+    return response.json()["access_token"]
+
+def main():
+    print("🚀 Starting Expert Verification...")
+    
+    # Authenticate as Expert
+    token = create_user_and_login("expert@example.com", role="expert")
+    headers = {"Authorization": f"Bearer {token}"}
     
     def post_check(url, data):
-        res = requests.post(url, json=data)
+        res = requests.post(url, json=data, headers=headers)
         if res.status_code >= 400:
             print(f"Error at {url}: {res.status_code}")
             print(f"Response: {res.text}")
@@ -97,15 +130,21 @@ def test_expert_system():
         # I'll add a temporary endpoint or just update the service to skip verification for this test if needed.
         # Actually, I'll just implement a quick update endpoint in the router.
         
+        
         print("Submitting Expert Vote...")
-        vote = post_check(f"{BASE_URL}/experts/{expert_id}/votes", {
+        vote_payload = {
             "entity_id": ent_id,
             "scoring_model_id": model_id,
-            "score": 9.8,
-            "confidence": 0.95,
-            "justification": "Unmatched flow and storytelling"
-        })
-        print(f"Submitted Expert Vote: {vote['score']}")
+            "score": 95.5,
+            "confidence": 0.9,
+            "justification": "Unmatched dominance in the 90s."
+        }
+        response = requests.post(f"{BASE_URL}/experts/{expert_id}/votes", json=vote_payload, headers=headers)
+        if response.status_code >= 400:
+            print(f"Error submitting vote: {response.status_code}")
+            print(f"Response: {response.text}")
+            response.raise_for_status()
+        print(f"Submitted Expert Vote")
 
         # 10. Run Scoring
         print("Running Scoring with Expert Influence...")
@@ -120,4 +159,4 @@ def test_expert_system():
         print(f"Verification failed: {e}")
 
 if __name__ == "__main__":
-    test_expert_system()
+    main()

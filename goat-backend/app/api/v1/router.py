@@ -1,8 +1,10 @@
 from fastapi import APIRouter
-from app.api.v1.routes import health, categories, subcategories, entities, scoring, experts, fan_votes, eras, influence
+from app.api.v1.routes import health, categories, subcategories, entities, scoring, experts, fan_votes, eras, influence, auth, users
 
 api_router = APIRouter()
 
+api_router.include_router(users.router, prefix="/users", tags=["users"])
+api_router.include_router(auth.router, tags=["login"])
 api_router.include_router(health.router, prefix="/health", tags=["health"])
 api_router.include_router(categories.router, prefix="/categories", tags=["categories"])
 api_router.include_router(subcategories.router, prefix="/subcategories", tags=["subcategories"])

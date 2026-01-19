@@ -77,10 +77,14 @@ def submit_raw_score(
     return {"message": "Raw score submitted successfully"}
 
 
+from app.api import deps
+from app.models.user import User
+
 @router.post("/run/{category_id}", response_model=List[FinalScoreResponse])
 def run_scoring(
     category_id: UUID,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_active_superuser)
 ):
     try:
         return scoring_service.run_scoring_for_category(db, category_id=category_id)

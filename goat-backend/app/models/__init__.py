@@ -47,6 +47,7 @@ from app.models.influence import (
     InfluenceModel,
     InfluenceScore
 )
+from app.models.user import User
 
 __all__ = [
     "Base",
@@ -83,4 +84,5 @@ __all__ = [
     "InfluenceEvent",
     "InfluenceModel",
     "InfluenceScore",
+    "User",
 ]

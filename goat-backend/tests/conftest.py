@@ -1,4 +1,7 @@
+import os
+import sys
 import pytest
+from uuid import uuid4
 from typing import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -49,8 +52,26 @@ def client(db) -> Generator[TestClient, None, None]:
             yield db
         finally:
             pass
+            
+    # Mock Auth for tests
+    from app.api import deps
+    from app.models.user import User
+    
+    def override_get_current_user():
+        # Return a mock user
+        return User(id=uuid4(), email="test@example.com", is_active=True, role="user", is_superuser=False)
+
+    def override_get_current_active_superuser():
+        return User(id=uuid4(), email="admin@example.com", is_active=True, role="admin", is_superuser=True)
+        
+    def override_get_current_expert():
+        return User(id=uuid4(), email="expert@example.com", is_active=True, role="expert", is_superuser=False)
 
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[deps.get_current_user] = override_get_current_user
+    app.dependency_overrides[deps.get_current_active_superuser] = override_get_current_active_superuser
+    app.dependency_overrides[deps.get_current_expert] = override_get_current_expert
+    
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()

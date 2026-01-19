@@ -10,24 +10,17 @@ from app.models.fan_voting import FanVote as FanVoteDB, FanVoteAggregate as FanV
 router = APIRouter()
 
 
+from app.api import deps
+from app.models.user import User
+
 @router.post("/", response_model=FanVote)
 def submit_fan_vote(
-    *,
-    db: Session = Depends(get_db),
     vote_in: FanVoteCreate,
-    request: Request
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_user)
 ):
-    # In a real app, user_id would come from auth token
-    # For now, we'll expect it in a header or just use a dummy for testing
-    user_id_str = request.headers.get("X-User-ID")
-    if not user_id_str:
-        raise HTTPException(status_code=401, detail="X-User-ID header required")
-    
-    try:
-        user_id = UUID(user_id_str)
-        return fan_voting_service.submit_vote(db, user_id=user_id, vote_in=vote_in)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    # Use authenticated user ID instead of header
+    return fan_voting_service.submit_vote(db, user_id=current_user.id, vote_in=vote_in)
 
 
 @router.get("/aggregates/{entity_id}/{category_id}", response_model=FanVoteAggregate)
