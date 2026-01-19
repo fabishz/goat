@@ -1,3 +1,4 @@
+from fastapi import APIRouter
 from app.api.v1.routes import health, categories, subcategories, entities, scoring, experts
 
 api_router = APIRouter()
