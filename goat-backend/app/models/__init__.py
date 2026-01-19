@@ -41,6 +41,13 @@ from app.models.era import (
     EraAuditLog
 )
 
+from app.models.influence import (
+    InfluenceSource,
+    InfluenceEvent,
+    InfluenceModel,
+    InfluenceScore
+)
+
 __all__ = [
     "Base",
     "Category",
@@ -72,4 +79,8 @@ __all__ = [
     "EraFactor",
     "EraAdjustedScore",
     "EraAuditLog",
+    "InfluenceSource",
+    "InfluenceEvent",
+    "InfluenceModel",
+    "InfluenceScore",
 ]

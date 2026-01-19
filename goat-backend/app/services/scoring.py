@@ -7,6 +7,10 @@ from app.models.scoring import ScoringModel, ScoringComponent, ScoringWeight, Ra
 from app.models.expert import ExpertVote, ExpertScoreContribution, Expert
 from app.models.fan_voting import FanVoteAggregate
 from app.models.era import EraFactor
+from app.models.expert import ExpertVote, ExpertScoreContribution, Expert
+from app.models.fan_voting import FanVoteAggregate
+from app.models.era import EraFactor
+from app.models.influence import InfluenceScore, InfluenceModel
 from app.models.entity import Entity
 
 
@@ -199,7 +203,36 @@ class ScoringService:
                 breakdown["fan_sentiment"] = round(fan_aggregate.aggregate_score * fan_influence_weight, 2)
                 explanations.append(f"Fan Sentiment: {fan_aggregate.vote_count} votes aggregated (10% weight)")
 
-            # 6. Save Final Score
+            # 6. Integrate Influence Score (AI-Assisted)
+            # Fetch active influence model for this category
+            inf_model = db.execute(
+                select(InfluenceModel).where(
+                    and_(
+                        InfluenceModel.category_id == category_id,
+                        InfluenceModel.is_active == True
+                    )
+                )
+            ).scalar_one_or_none()
+
+            if inf_model:
+                inf_score = db.execute(
+                    select(InfluenceScore).where(
+                        and_(
+                            InfluenceScore.entity_id == entity.id,
+                            InfluenceScore.influence_model_id == inf_model.id
+                        )
+                    )
+                ).scalar_one_or_none()
+
+                if inf_score:
+                    # Influence is capped at 15% of the final score
+                    inf_weight = 0.15
+                    total_score = (total_score * (1 - inf_weight)) + (inf_score.total_score * inf_weight)
+                    
+                    breakdown["ai_influence"] = round(inf_score.total_score * inf_weight, 2)
+                    explanations.append(f"AI Influence: {inf_score.total_score:.1f} (15% weight)")
+
+            # 7. Save Final Score
             final_score = FinalScore(
                 entity_id=entity.id,
                 scoring_model_id=model.id,
