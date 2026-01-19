@@ -146,6 +146,9 @@ class ScoringService:
         
         scores = db.execute(query).scalars().all()
         
+        if not scores:
+            raise ValueError("No scores found to create a snapshot for this category")
+            
         snapshot_data = [
             {
                 "entity_name": s.entity.name,
