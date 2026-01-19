@@ -14,6 +14,17 @@ from app.models.scoring import (
     RankingSnapshot
 )
 
+from app.models.expert import (
+    Expert,
+    ExpertDomain,
+    ExpertReputationEvent,
+    ConflictDisclosure,
+    ExpertVote,
+    ExpertScoreContribution,
+    ExpertAuditLog,
+    ExpertRole
+)
+
 __all__ = [
     "Base",
     "Category",
@@ -27,4 +38,12 @@ __all__ = [
     "RawScore",
     "FinalScore",
     "RankingSnapshot",
+    "Expert",
+    "ExpertDomain",
+    "ExpertReputationEvent",
+    "ConflictDisclosure",
+    "ExpertVote",
+    "ExpertScoreContribution",
+    "ExpertAuditLog",
+    "ExpertRole",
 ]

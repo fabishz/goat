@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from app.models.scoring import ScoringModel, ScoringComponent, ScoringWeight, RawScore, FinalScore, RankingSnapshot
+from app.models.expert import ExpertVote, ExpertScoreContribution, Expert
 from app.models.entity import Entity
 
 
@@ -119,7 +120,37 @@ class ScoringService:
                 total_score += component_contribution
                 breakdown[component.slug] = round(component_contribution, 2)
 
-            # 4. Save Final Score
+            # 4. Integrate Expert Votes
+            expert_votes_query = select(ExpertVote).where(
+                and_(
+                    ExpertVote.entity_id == entity.id,
+                    ExpertVote.scoring_model_id == model.id
+                )
+            )
+            expert_votes = db.execute(expert_votes_query).scalars().all()
+            
+            if expert_votes:
+                expert_total = 0.0
+                expert_weight_sum = 0.0
+                
+                for ev in expert_votes:
+                    # Calculate weight based on reputation and confidence
+                    # (Simplified: using a base weight of 1.0 for now)
+                    ev_weight = ev.confidence * ev.expert.reputation_score
+                    expert_total += ev.score * ev_weight
+                    expert_weight_sum += ev_weight
+                
+                if expert_weight_sum > 0:
+                    avg_expert_score = (expert_total / expert_weight_sum) * 10 # Scale 0-10 to 0-100
+                    
+                    # Expert influence is capped at 20% of the final score
+                    expert_influence_weight = 0.2
+                    total_score = (total_score * (1 - expert_influence_weight)) + (avg_expert_score * expert_influence_weight)
+                    
+                    breakdown["expert_influence"] = round(avg_expert_score * expert_influence_weight, 2)
+                    explanations.append(f"Expert Influence: {len(expert_votes)} votes aggregated (20% weight)")
+
+            # 5. Save Final Score
             final_score = FinalScore(
                 entity_id=entity.id,
                 scoring_model_id=model.id,
