@@ -9,3 +9,4 @@ api_router.include_router(subcategories.router, prefix="/subcategories", tags=["
 api_router.include_router(entities.router, prefix="/entities", tags=["entities"])
 api_router.include_router(scoring.router, prefix="/scoring", tags=["scoring"])
 api_router.include_router(experts.router, prefix="/experts", tags=["experts"])
+api_router.include_router(fan_votes.router, prefix="/fan-votes", tags=["fan-votes"])
