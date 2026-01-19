@@ -25,6 +25,14 @@ from app.models.expert import (
     ExpertRole
 )
 
+from app.models.fan_voting import (
+    UserTrustScore,
+    FanVote,
+    FanVoteVersion,
+    FanVoteAggregate,
+    VoteAnomaly
+)
+
 __all__ = [
     "Base",
     "Category",
@@ -46,4 +54,9 @@ __all__ = [
     "ExpertScoreContribution",
     "ExpertAuditLog",
     "ExpertRole",
+    "UserTrustScore",
+    "FanVote",
+    "FanVoteVersion",
+    "FanVoteAggregate",
+    "VoteAnomaly",
 ]
