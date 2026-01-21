@@ -1,0 +1,148 @@
+import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Crown, Trophy, GitCompare, Vote, User, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
+const navItems = [
+  { path: '/', label: 'Home', icon: Crown },
+  { path: '/categories', label: 'Rankings', icon: Trophy },
+  { path: '/compare', label: 'Compare', icon: GitCompare },
+  { path: '/vote', label: 'Vote', icon: Vote },
+];
+
+export function Navbar() {
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-strong">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <motion.div
+              whileHover={{ rotate: 10, scale: 1.1 }}
+              className="text-accent"
+            >
+              <Crown className="w-8 h-8" />
+            </motion.div>
+            <span className="font-serif text-xl font-bold gold-text">
+              GOAT Rankings
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link key={item.path} to={item.path}>
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        'relative px-4 py-2 font-medium transition-colors',
+                        isActive 
+                          ? 'text-accent' 
+                          : 'text-muted-foreground hover:text-foreground'
+                      )}
+                    >
+                      <item.icon className="w-4 h-4 mr-2" />
+                      {item.label}
+                      {isActive && (
+                        <motion.div
+                          layoutId="navbar-indicator"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
+                          initial={false}
+                        />
+                      )}
+                    </Button>
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* User Actions */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link to="/profile">
+              <Button variant="outline" size="sm" className="border-accent/30 hover:border-accent hover:bg-accent/10">
+                <User className="w-4 h-4 mr-2" />
+                Profile
+              </Button>
+            </Link>
+            <Link to="/vote">
+              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow">
+                Vote Now
+              </Button>
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden pb-4"
+          >
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        'w-full justify-start',
+                        isActive && 'bg-accent/10 text-accent'
+                      )}
+                    >
+                      <item.icon className="w-4 h-4 mr-2" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                );
+              })}
+              <div className="pt-2 border-t border-border flex gap-2">
+                <Link to="/profile" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full">
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </Button>
+                </Link>
+                <Link to="/vote" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-accent text-accent-foreground">
+                    Vote Now
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </nav>
+  );
+}
