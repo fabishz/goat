@@ -184,7 +184,7 @@ export default function Home() {
             {[
               { name: 'Michael Jordan', title: 'The Standard', img: '/images/jordan_legend.png', trophy: '/images/nba_trophy.png', category: 'nba' },
               { name: 'Lionel Messi', title: 'The Maestro', img: '/images/messi_legend.png', trophy: '/images/world_cup.png', category: 'football' },
-              { name: 'Cristiano Ronaldo', title: 'The Machine', img: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80', trophy: '/images/world_cup.png', category: 'football' },
+              { name: 'Cristiano Ronaldo', title: 'The Machine', img: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&q=80', trophy: '/images/world_cup.png', category: 'football' },
               { name: 'LeBron James', title: 'The King', img: '/images/lebron_legend.png', trophy: '/images/nba_trophy.png', category: 'nba' },
             ].map((legend, i) => (
               <motion.div

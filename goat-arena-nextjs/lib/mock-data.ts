@@ -136,7 +136,7 @@ export const goats: Goat[] = [
     subdomain: 'Football',
     era: ['2000s', '2010s', '2020s'],
     region: 'Europe',
-    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&q=80',
     country: 'Portugal',
     overallScore: 96.5,
     stats: {
