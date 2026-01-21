@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.fan_voting import FanVote, FanVoteCreate, FanVoteAggregate
 from app.services.fan_voting import fan_voting_service
+from app.services.entity import entity_service
 from app.models.fan_voting import FanVote as FanVoteDB, FanVoteAggregate as FanVoteAggregateDB
 
 router = APIRouter()
@@ -19,7 +20,11 @@ def submit_fan_vote(
     db: Session = Depends(get_db),
     current_user: User = Depends(deps.get_current_user)
 ):
-    # Use authenticated user ID instead of header
+    # Validate that the GOAT belongs to the category
+    goat = entity_service.get_entity(db, entity_id=vote_in.entity_id)
+    if not goat or goat.category_id != vote_in.category_id:
+        raise HTTPException(status_code=400, detail="GOAT does not belong to this category")
+        
     return fan_voting_service.submit_vote(db, user_id=current_user.id, vote_in=vote_in)
 
 

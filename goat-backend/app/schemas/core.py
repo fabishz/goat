@@ -16,6 +16,7 @@ class TimestampSchema(BaseSchema):
 # Category
 class CategoryBase(BaseSchema):
     name: str
+    domain: str
     description: Optional[str] = None
     slug: str
 
@@ -26,6 +27,7 @@ class CategoryCreate(CategoryBase):
 
 class CategoryUpdate(BaseSchema):
     name: Optional[str] = None
+    domain: Optional[str] = None
     description: Optional[str] = None
     slug: Optional[str] = None
 
@@ -94,7 +96,8 @@ class EntityBase(BaseSchema):
     name: str
     description: Optional[str] = None
     slug: str
-    image_url: Optional[str] = None
+    image_url: str
+    category_id: UUID
     subcategory_id: UUID
 
 
@@ -107,6 +110,7 @@ class EntityUpdate(BaseSchema):
     description: Optional[str] = None
     slug: Optional[str] = None
     image_url: Optional[str] = None
+    category_id: Optional[UUID] = None
     subcategory_id: Optional[UUID] = None
 
 
