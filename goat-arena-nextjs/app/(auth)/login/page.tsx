@@ -54,6 +54,7 @@ export default function LoginPage() {
                             placeholder="••••••••"
                             className="pl-12 bg-background/50 border-border/50 h-12 rounded-xl focus:ring-accent/50"
                             required
+                            autoComplete="current-password"
                         />
                     </div>
                 </div>

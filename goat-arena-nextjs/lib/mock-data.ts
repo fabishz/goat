@@ -43,7 +43,7 @@ export const goats: Goat[] = [
     subdomain: 'Basketball',
     era: ['1980s', '1990s'],
     region: 'North America',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Michael_Jordan_in_2014.jpg/800px-Michael_Jordan_in_2014.jpg',
+    image: '/images/jordan_legend.png',
     country: 'USA',
     overallScore: 98.7,
     stats: {
@@ -76,7 +76,7 @@ export const goats: Goat[] = [
     subdomain: 'Basketball',
     era: ['2000s', '2010s', '2020s'],
     region: 'North America',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/LeBron_James_crop_2023.jpg/800px-LeBron_James_crop_2023.jpg',
+    image: '/images/lebron_legend.png',
     country: 'USA',
     overallScore: 97.8,
     stats: {
@@ -103,7 +103,7 @@ export const goats: Goat[] = [
     subdomain: 'Football',
     era: ['2000s', '2010s', '2020s'],
     region: 'South America',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/800px-Lionel_Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg',
+    image: '/images/messi_legend.png',
     country: 'Argentina',
     overallScore: 97.2,
     stats: {
@@ -136,7 +136,7 @@ export const goats: Goat[] = [
     subdomain: 'Football',
     era: ['2000s', '2010s', '2020s'],
     region: 'Europe',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Cristiano_Ronaldo_playing_for_Al_Nassr_FC_against_Al_Fateh_FC_on_3_February_2023_%28cropped%29.jpg/800px-Cristiano_Ronaldo_playing_for_Al_Nassr_FC_against_Al_Fateh_FC_on_3_February_2023_%28cropped%29.jpg',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
     country: 'Portugal',
     overallScore: 96.5,
     stats: {

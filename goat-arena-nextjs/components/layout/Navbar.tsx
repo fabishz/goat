@@ -7,18 +7,32 @@ import { Crown, Trophy, GitCompare, Vote, User, Menu, X, MessageSquare } from 'l
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  { path: '/', label: 'Home', icon: Crown },
-  { path: '/categories', label: 'Rankings', icon: Trophy },
-  { path: '/compare', label: 'Compare', icon: GitCompare },
-  { path: '/vote', label: 'Vote', icon: Vote },
-  { path: '/debates', label: 'Debates', icon: MessageSquare },
-];
+import { useAppStore } from '@/stores/app-store';
 
 export function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { currentCategoryId } = useAppStore();
+
+  const navItems = [
+    { path: '/', label: 'Home', icon: Crown },
+    { path: '/categories', label: 'Rankings', icon: Trophy },
+    {
+      path: currentCategoryId ? `/categories/${currentCategoryId}/compare` : '/categories',
+      label: 'Compare',
+      icon: GitCompare
+    },
+    {
+      path: currentCategoryId ? `/categories/${currentCategoryId}/compare` : '/categories',
+      label: 'Vote',
+      icon: Vote
+    },
+    {
+      path: currentCategoryId ? `/categories/${currentCategoryId}/debates` : '/categories',
+      label: 'Debates',
+      icon: MessageSquare
+    },
+  ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-strong">
@@ -42,7 +56,7 @@ export function Navbar() {
             {navItems.map((item) => {
               const isActive = pathname === item.path;
               return (
-                <Link key={item.path} href={item.path}>
+                <Link key={item.label} href={item.path}>
                   <motion.div
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
@@ -113,7 +127,7 @@ export function Navbar() {
                 const isActive = pathname === item.path;
                 return (
                   <Link
-                    key={item.path}
+                    key={item.label}
                     href={item.path}
                     onClick={() => setMobileMenuOpen(false)}
                   >

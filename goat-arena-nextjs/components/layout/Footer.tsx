@@ -1,7 +1,11 @@
+"use client";
+
 import { Crown, Twitter, Instagram, Youtube, Mail } from 'lucide-react';
 import Link from 'next/link';
+import { useAppStore } from '@/stores/app-store';
 
 export function Footer() {
+  const { currentCategoryId } = useAppStore();
   return (
     <footer className="border-t border-border bg-card/50">
       <div className="container mx-auto px-4 py-12">
@@ -44,11 +48,31 @@ export function Footer() {
           <div>
             <h4 className="font-serif font-semibold mb-4">Platform</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/vote" className="hover:text-accent transition-colors">Vote</Link></li>
-              <li><Link href="/compare" className="hover:text-accent transition-colors">Compare GOATs</Link></li>
-              <li><Link href="/profile" className="hover:text-accent transition-colors">Your Profile</Link></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Methodology</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">API Access</a></li>
+              <li>
+                <Link
+                  href={currentCategoryId ? `/categories/${currentCategoryId}/compare` : '/categories'}
+                  className="hover:text-accent transition-colors"
+                >
+                  Vote
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={currentCategoryId ? `/categories/${currentCategoryId}/compare` : '/categories'}
+                  className="hover:text-accent transition-colors"
+                >
+                  Compare GOATs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={currentCategoryId ? `/categories/${currentCategoryId}/debates` : '/categories'}
+                  className="hover:text-accent transition-colors"
+                >
+                  Active Debates
+                </Link>
+              </li>
+              <li><Link href="/dashboard" className="hover:text-accent transition-colors">Your Dashboard</Link></li>
             </ul>
           </div>
 

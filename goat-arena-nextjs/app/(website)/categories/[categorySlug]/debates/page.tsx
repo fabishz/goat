@@ -109,14 +109,14 @@ export default function DebatesPage() {
                                     { name: 'GoatWatcher', points: 1650, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3' },
                                     { name: 'StatKing', points: 1420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=4' },
                                     { name: 'DebateMaster', points: 1280, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=5' },
-                                ].map((user, i) => (
+                                ].map((contributor, i) => (
                                     <div key={i} className="flex items-center justify-between p-3 rounded-lg hover:bg-accent/5 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <span className="text-xs font-bold text-muted-foreground w-4">{i + 1}</span>
-                                            <NextImage src={user.avatar} alt={user.name} width={32} height={32} className="rounded-full bg-secondary" />
-                                            <span className="font-medium text-sm">{user.name}</span>
+                                            <NextImage src={contributor.avatar} alt={contributor.name} width={32} height={32} className="rounded-full bg-secondary" />
+                                            <span className="font-medium text-sm">{contributor.name}</span>
                                         </div>
-                                        <div className="text-xs font-bold text-accent">{user.points} pts</div>
+                                        <div className="text-xs font-bold text-accent">{contributor.points} pts</div>
                                     </div>
                                 ))}
                             </div>

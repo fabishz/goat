@@ -64,6 +64,7 @@ export default function RegisterPage() {
                             placeholder="••••••••"
                             className="pl-12 bg-background/50 border-border/50 h-12 rounded-xl focus:ring-accent/50"
                             required
+                            autoComplete="new-password"
                         />
                     </div>
                 </div>
