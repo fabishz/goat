@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from app.models.subcategory import SubCategory
     from app.models.achievement import Achievement
     from app.models.award import Award
+    from app.models.category import Category
 
 
 class Entity(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
@@ -17,12 +18,16 @@ class Entity(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     name: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     slug: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
-    image_url: Mapped[str] = mapped_column(String(512), nullable=True)
+    image_url: Mapped[str] = mapped_column(String(512), nullable=False)
     
+    category_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("categories.id", ondelete="CASCADE"), index=True, nullable=False
+    )
     subcategory_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("subcategories.id", ondelete="CASCADE"), nullable=False
     )
 
+    category: Mapped["Category"] = relationship("Category")
     subcategory: Mapped["SubCategory"] = relationship("SubCategory", back_populates="entities")
     achievements: Mapped[List["Achievement"]] = relationship(
         "Achievement", back_populates="entity", cascade="all, delete-orphan"

@@ -4,6 +4,7 @@ from uuid import uuid4
 def test_create_category(client):
     response = client.post("/api/v1/categories/", json={
         "name": "IntegrationTestCat",
+        "domain": "Sports",
         "description": "Testing API",
         "slug": "integration-test-cat"
     })
@@ -16,6 +17,7 @@ def test_create_scoring_model(client):
     # 1. Create Category
     cat_res = client.post("/api/v1/categories/", json={
         "name": "ModelTestCat",
+        "domain": "Sports",
         "slug": "model-test-cat"
     })
     cat_id = cat_res.json()["id"]
@@ -42,13 +44,19 @@ def test_create_scoring_model(client):
 
 def test_run_scoring_api(client):
     # 1. Setup Data
-    cat_res = client.post("/api/v1/categories/", json={"name": "RunScoreCat", "slug": "run-score-cat"})
+    cat_res = client.post("/api/v1/categories/", json={"name": "RunScoreCat", "domain": "Sports", "slug": "run-score-cat"})
     cat_id = cat_res.json()["id"]
     
     sub_res = client.post("/api/v1/subcategories/", json={"name": "Sub", "slug": "sub", "category_id": cat_id})
     sub_id = sub_res.json()["id"]
     
-    ent_res = client.post("/api/v1/entities/", json={"name": "Ent", "slug": "ent", "subcategory_id": sub_id})
+    ent_res = client.post("/api/v1/entities/", json={
+        "name": "Ent", 
+        "slug": "ent", 
+        "subcategory_id": sub_id,
+        "category_id": cat_id,
+        "image_url": "https://example.com/image.jpg"
+    })
     ent_id = ent_res.json()["id"]
     
     comp_res = client.post("/api/v1/scoring/components", json={"name": "Comp", "slug": "comp", "normalization_type": "min-max"})

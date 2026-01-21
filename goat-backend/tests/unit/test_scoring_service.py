@@ -51,7 +51,7 @@ def test_calculate_era_adjustment(db):
 
 def test_run_scoring_full_flow(db):
     # 1. Setup Data
-    cat = Category(name="TestCat", slug="testcat")
+    cat = Category(name="TestCat", slug="testcat", domain="Sports")
     db.add(cat)
     db.commit()
     
@@ -59,7 +59,13 @@ def test_run_scoring_full_flow(db):
     db.add(sub)
     db.commit()
     
-    entity = Entity(name="TestEntity", slug="testentity", subcategory_id=sub.id)
+    entity = Entity(
+        name="TestEntity", 
+        slug="testentity", 
+        subcategory_id=sub.id, 
+        category_id=cat.id,
+        image_url="https://example.com/image.jpg"
+    )
     db.add(entity)
     db.commit()
     
