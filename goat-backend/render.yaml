@@ -16,6 +16,6 @@ services:
       - key: DEBUG
         value: false
       - key: BACKEND_CORS_ORIGINS
-        value: https://your-frontend-domain.com
+        value: "http://localhost:3000,https://goat-arena.vercel.app"
       - key: PYTHON_VERSION
         value: 3.11.0
