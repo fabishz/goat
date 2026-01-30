@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import NextTopLoader from 'nextjs-toploader';
 import { Providers } from "./providers";
 import { Layout } from "@/components/layout/Layout";
 
@@ -20,6 +21,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+        <NextTopLoader
+          color="#FFD700"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #FFD700,0 0 5px #FFD700"
+        />
         <Providers>
           {children}
         </Providers>
