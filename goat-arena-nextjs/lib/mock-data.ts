@@ -103,7 +103,7 @@ export const goats: Goat[] = [
     subdomain: 'Basketball',
     era: ['1990s', '2000s', '2010s'],
     region: 'North America',
-    image: 'https://images.unsplash.com/photo-1519766304800-c9519d22b8e1?w=800&q=80',
+    image: '/images/kobe_legend.png',
     country: 'USA',
     overallScore: 96.8,
     stats: {
@@ -130,7 +130,7 @@ export const goats: Goat[] = [
     subdomain: 'Basketball',
     era: ['1960s', '1970s', '1980s'],
     region: 'North America',
-    image: 'https://images.unsplash.com/photo-1546519638-68e109498ad0?w=800&q=80',
+    image: '/images/kareem_legend.png',
     country: 'USA',
     overallScore: 96.5,
     stats: {
@@ -190,7 +190,7 @@ export const goats: Goat[] = [
     subdomain: 'Football',
     era: ['2000s', '2010s', '2020s'],
     region: 'Europe',
-    image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&q=80',
+    image: '/images/ronaldo_legend.png',
     country: 'Portugal',
     overallScore: 96.5,
     stats: {
@@ -217,7 +217,7 @@ export const goats: Goat[] = [
     subdomain: 'Football',
     era: ['1950s', '1960s', '1970s'],
     region: 'South America',
-    image: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=800&q=80',
+    image: '/images/pele_legend.png',
     country: 'Brazil',
     overallScore: 98.1,
     stats: {
@@ -244,7 +244,7 @@ export const goats: Goat[] = [
     subdomain: 'Football',
     era: ['1970s', '1980s', '1990s'],
     region: 'South America',
-    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80',
+    image: '/images/maradona_legend.png',
     country: 'Argentina',
     overallScore: 97.5,
     stats: {
@@ -271,7 +271,7 @@ export const goats: Goat[] = [
     subdomain: 'Rap',
     era: ['1990s'],
     region: 'North America',
-    image: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=800&q=80',
+    image: '/images/tupac_legend.png',
     country: 'USA',
     overallScore: 98.5,
     stats: {
