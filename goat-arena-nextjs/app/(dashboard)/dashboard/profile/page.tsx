@@ -1,17 +1,54 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Award, Star, Zap, ShieldCheck, MapPin, Calendar, Edit2, Share2, Crown } from 'lucide-react';
-import { currentUser } from '@/lib/mock-data';
+import { Award, Star, Zap, ShieldCheck, MapPin, Calendar, Edit2, Share2, Crown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { useAppStore } from '@/stores/app-store';
+import { useState } from 'react';
+import { api } from '@/lib/api';
+import { toast } from 'sonner';
 import NextImage from 'next/image';
 
 export default function ProfilePage() {
-    const user = currentUser;
+    const { user, token, checkAuth } = useAppStore();
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Form state
+    const [name, setName] = useState(user?.name || '');
+    const [email, setEmail] = useState(user?.email || '');
+
+    if (!user) {
+        return (
+            <div className="h-[60vh] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-accent" />
+            </div>
+        );
+    }
+
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+            await api.put('/users/me', {
+                full_name: name,
+                email: email
+            });
+            await checkAuth();
+            toast.success('Profile updated successfully');
+            setIsEditing(false);
+        } catch (error) {
+            toast.error('Failed to update profile');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     return (
-        <div className="p-8 max-w-6xl mx-auto">
+        <div className="p-8 max-w-6xl mx-auto pb-24">
             {/* Profile Header Card */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -26,7 +63,7 @@ export default function ProfilePage() {
                 <div className="px-8 pb-8 relative">
                     <div className="flex flex-col md:flex-row items-end gap-6 -mt-16 mb-8">
                         <div className="relative">
-                            <div className="w-32 h-32 rounded-2xl border-4 border-background bg-card p-1 gold-glow overflow-hidden">
+                            <div className="w-32 h-32 rounded-2xl border-4 border-background bg-card p-1 gold-glow overflow-hidden relative">
                                 <NextImage src={user.avatar} alt={user.name} fill className="object-cover rounded-xl" />
                             </div>
                             <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-lg bg-accent flex items-center justify-center border-2 border-background shadow-lg">
@@ -38,18 +75,44 @@ export default function ProfilePage() {
                             <h1 className="text-4xl font-serif font-bold mb-1">{user.name}</h1>
                             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-muted-foreground">
                                 <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Global Arena</span>
-                                <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Joined Jan 2024</span>
+                                <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Joined Feb 2026</span>
                                 <span className="text-accent font-bold uppercase tracking-widest text-[10px] bg-accent/10 px-2 py-0.5 rounded-full border border-accent/20">
-                                    Level {user.level} Pro
+                                    {user.role} Member
                                 </span>
                             </div>
                         </div>
 
                         <div className="flex gap-3">
-                            <Button variant="outline" className="border-border/50">
-                                <Edit2 className="w-4 h-4 mr-2" />
-                                Edit Profile
-                            </Button>
+                            <Dialog open={isEditing} onOpenChange={setIsEditing}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" className="border-border/50" onClick={() => {
+                                        setName(user.name);
+                                        setEmail(user.email);
+                                    }}>
+                                        <Edit2 className="w-4 h-4 mr-2" />
+                                        Edit Profile
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="glass border-border/50">
+                                    <DialogHeader>
+                                        <DialogTitle>Update Profile</DialogTitle>
+                                    </DialogHeader>
+                                    <form onSubmit={handleUpdateProfile} className="space-y-4 pt-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold uppercase tracking-wider">Full Name</label>
+                                            <Input value={name} onChange={(e) => setName(e.target.value)} required />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold uppercase tracking-wider">Email Address</label>
+                                            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                        </div>
+                                        <Button type="submit" className="w-full bg-accent text-accent-foreground mt-4" disabled={isSaving}>
+                                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                            Save Changes
+                                        </Button>
+                                    </form>
+                                </DialogContent>
+                            </Dialog>
                             <Button variant="outline" size="icon" className="border-border/50">
                                 <Share2 className="w-4 h-4" />
                             </Button>
@@ -91,16 +154,16 @@ export default function ProfilePage() {
                                     <span className="text-muted-foreground">Level {user.level}</span>
                                     <span className="text-accent">Level {user.level + 1}</span>
                                 </div>
-                                <Progress value={65} className="h-2" />
+                                <Progress value={10} className="h-2" />
                                 <p className="text-[10px] text-muted-foreground mt-2 text-center">
-                                    750 points until next rank
+                                    Welcome to the Arena
                                 </p>
                             </div>
 
                             <div className="pt-6 border-t border-border/50">
                                 <h4 className="text-sm font-bold uppercase tracking-widest mb-4">Bio</h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Passionate sports and music historian. I&apos;ve been following the GOAT debates for over a decade, focusing on statistical dominance and cultural impact.
+                                <p className="text-sm text-muted-foreground leading-relaxed italic">
+                                    No bio set. Edit your profile to add one.
                                 </p>
                             </div>
                         </div>
@@ -116,10 +179,12 @@ export default function ProfilePage() {
                                 <span className="text-xs font-bold">Email Verified</span>
                                 <ShieldCheck className="w-4 h-4 text-green-500" />
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-accent/5 border border-accent/20">
-                                <span className="text-xs font-bold">Pro Member</span>
-                                <Crown className="w-4 h-4 text-accent" />
-                            </div>
+                            {user.role === 'admin' && (
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-accent/5 border border-accent/20">
+                                    <span className="text-xs font-bold">Administrator</span>
+                                    <Crown className="w-4 h-4 text-accent" />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -131,18 +196,8 @@ export default function ProfilePage() {
                             <Award className="w-5 h-5 text-accent" />
                             Hall of Fame
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {user.badges.map((badge) => (
-                                <div key={badge.id} className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/30 border border-border/50 hover:border-accent/30 transition-all group">
-                                    <div className="text-4xl group-hover:scale-110 transition-transform">{badge.icon}</div>
-                                    <div>
-                                        <div className="font-bold text-sm mb-0.5">{badge.name}</div>
-                                        <div className="text-[10px] text-muted-foreground uppercase tracking-tighter leading-tight">
-                                            {badge.description}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="text-center py-12">
+                            <p className="text-muted-foreground text-sm">Join debates and vote to earn achievements!</p>
                         </div>
                     </div>
 
@@ -153,10 +208,10 @@ export default function ProfilePage() {
                         </h3>
                         <div className="space-y-6">
                             {[
-                                { label: 'Sports', value: 85, color: 'bg-accent' },
-                                { label: 'Music', value: 65, color: 'bg-blue-500' },
-                                { label: 'Science', value: 40, color: 'bg-green-500' },
-                                { label: 'Culture', value: 55, color: 'bg-purple-500' },
+                                { label: 'Sports', value: 0, color: 'bg-accent' },
+                                { label: 'Music', value: 0, color: 'bg-blue-500' },
+                                { label: 'Science', value: 0, color: 'bg-green-500' },
+                                { label: 'Culture', value: 0, color: 'bg-purple-500' },
                             ].map((item) => (
                                 <div key={item.label}>
                                     <div className="flex justify-between text-xs font-bold mb-2">

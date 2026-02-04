@@ -21,6 +21,11 @@ class UserCreate(UserBase):
             raise ValueError("Password must contain at least one special character (@$!%*#?&)")
         return v
 
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+
 class User(UserBase):
     id: UUID
     is_active: bool
