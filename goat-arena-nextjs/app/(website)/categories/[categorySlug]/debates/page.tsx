@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useDebates, useTrendingDebates } from '@/hooks/use-debates';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import NextImage from 'next/image';
+import { AuthActionGate } from '@/components/auth/AuthActionGate';
 
 export default function DebatesPage() {
     const params = useParams();
@@ -132,9 +133,11 @@ export default function DebatesPage() {
                             <p className="text-sm opacity-90 mb-6 leading-relaxed">
                                 Create a new debate between any two GOATs and let the community decide who truly reigns supreme.
                             </p>
-                            <Button className="w-full bg-white text-accent hover:bg-white/90 font-bold">
-                                Start New Debate
-                            </Button>
+                            <AuthActionGate actionName="to start a debate">
+                                <Button className="w-full bg-white text-accent hover:bg-white/90 font-bold">
+                                    Start New Debate
+                                </Button>
+                            </AuthActionGate>
                         </section>
                     </div>
                 </div>

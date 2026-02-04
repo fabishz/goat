@@ -19,6 +19,7 @@ import { goats, experts, debates } from '@/lib/mock-data';
 import { useAppStore } from '@/stores/app-store';
 
 import NextImage from 'next/image';
+import { AuthActionGate } from '@/components/auth/AuthActionGate';
 
 export default function GoatProfile() {
     const params = useParams();
@@ -243,7 +244,9 @@ export default function GoatProfile() {
                                                 <div className="text-center py-12 glass rounded-xl border border-dashed border-border">
                                                     <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                                                     <p className="text-muted-foreground">No active debates for this GOAT yet.</p>
-                                                    <Button variant="outline" className="mt-4">Start a Debate</Button>
+                                                    <AuthActionGate actionName="to start a debate">
+                                                        <Button variant="outline" className="mt-4">Start a Debate</Button>
+                                                    </AuthActionGate>
                                                 </div>
                                             )}
                                         </div>

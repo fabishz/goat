@@ -19,6 +19,7 @@ import { useAppStore } from '@/stores/app-store';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import NextImage from 'next/image';
+import { AuthActionGate } from '@/components/auth/AuthActionGate';
 
 export default function Vote() {
     const { currentVote, setVoteStep, setVoteGoat, setVoteReason, resetVote } = useAppStore();
@@ -172,14 +173,16 @@ export default function Vote() {
                                 </div>
                             </div>
                             <div className="flex justify-end">
-                                <Button
-                                    size="lg"
-                                    disabled={!selectedGoat}
-                                    onClick={handleNext}
-                                    className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow px-12 h-14 text-lg font-bold"
-                                >
-                                    Continue <ChevronRight className="w-5 h-5 ml-2" />
-                                </Button>
+                                <AuthActionGate actionName="to continue" className="w-full md:w-auto">
+                                    <Button
+                                        size="lg"
+                                        disabled={!selectedGoat}
+                                        onClick={handleNext}
+                                        className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow px-12 h-14 text-lg font-bold w-full"
+                                    >
+                                        Continue <ChevronRight className="w-5 h-5 ml-2" />
+                                    </Button>
+                                </AuthActionGate>
                             </div>
                         </motion.div>
                     )}
@@ -275,17 +278,19 @@ export default function Vote() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between items-center gap-4">
                                 <Button variant="ghost" onClick={handleBack} size="lg">
                                     <ChevronLeft className="w-5 h-5 mr-2" /> Back
                                 </Button>
-                                <Button
-                                    size="lg"
-                                    onClick={handleNext}
-                                    className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow px-12 h-14 text-lg font-bold"
-                                >
-                                    Review Vote <ChevronRight className="w-5 h-5 ml-2" />
-                                </Button>
+                                <AuthActionGate actionName="to review and submit" className="flex-1 md:flex-none">
+                                    <Button
+                                        size="lg"
+                                        onClick={handleNext}
+                                        className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow px-12 h-14 text-lg font-bold w-full"
+                                    >
+                                        Review Vote <ChevronRight className="w-5 h-5 ml-2" />
+                                    </Button>
+                                </AuthActionGate>
                             </div>
                         </motion.div>
                     )}

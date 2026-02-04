@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/stores/app-store';
 import { useEffect } from 'react';
 import NextImage from 'next/image';
+import { AuthActionGate } from '@/components/auth/AuthActionGate';
 
 export default function CategoryPage() {
     const params = useParams();
@@ -135,11 +136,13 @@ export default function CategoryPage() {
                                 </div>
 
                                 <div className="mt-12 text-center">
-                                    <Link href={`/categories/${categorySlug}/compare?goatA=${featuredGoats[0].id}&goatB=${featuredGoats[1].id}`}>
-                                        <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-12 h-14 text-lg font-bold gold-glow">
-                                            VOTE NOW
-                                        </Button>
-                                    </Link>
+                                    <AuthActionGate actionName="to vote">
+                                        <Link href={`/categories/${categorySlug}/compare?goatA=${featuredGoats[0].id}&goatB=${featuredGoats[1].id}`}>
+                                            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-12 h-14 text-lg font-bold gold-glow">
+                                                VOTE NOW
+                                            </Button>
+                                        </Link>
+                                    </AuthActionGate>
                                 </div>
                             </div>
                         </FadeIn>

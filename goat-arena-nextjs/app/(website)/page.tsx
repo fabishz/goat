@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { goats, debates, experts } from '@/lib/mock-data';
 import NextImage from 'next/image';
 import { cn } from '@/lib/utils';
+import { AuthActionGate } from '@/components/auth/AuthActionGate';
 
 export default function Home() {
   const topGoats = goats.slice(0, 4);
@@ -106,12 +107,14 @@ export default function Home() {
               transition={{ delay: 0.7 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link href="/vote">
-                <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow text-lg px-8 py-6">
-                  <Crown className="w-5 h-5 mr-2" />
-                  Vote Now
-                </Button>
-              </Link>
+              <AuthActionGate actionName="to vote">
+                <Link href="/vote">
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow text-lg px-8 py-6">
+                    <Crown className="w-5 h-5 mr-2" />
+                    Vote Now
+                  </Button>
+                </Link>
+              </AuthActionGate>
               <Link href="/categories">
                 <Button size="lg" variant="outline" className="border-border hover:border-accent hover:bg-accent/10 text-lg px-8 py-6">
                   Explore Rankings
@@ -381,12 +384,14 @@ export default function Home() {
                 </span>
               </div>
 
-              <Link href="/vote" className="relative z-10">
-                <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow">
-                  Cast Your Vote
-                  <ChevronRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
+              <AuthActionGate actionName="to vote" className="relative z-10">
+                <Link href="/vote">
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 gold-glow">
+                    Cast Your Vote
+                    <ChevronRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+              </AuthActionGate>
             </div>
           </FadeIn>
         </div>
