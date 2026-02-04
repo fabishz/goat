@@ -21,6 +21,14 @@ app = FastAPI(
     redoc_url="/redoc" if settings.DEBUG else None,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "https://goat-backend-ocds.onrender.com", "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
@@ -76,14 +84,7 @@ async def shutdown_event():
     logger.info(f"Shutting down {settings.PROJECT_NAME}")
 
 # Set all CORS enabled origins
-if settings.BACKEND_CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+# Managed by explicit CORSMiddleware above
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
