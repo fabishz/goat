@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Settings, Bell, Lock, Eye, Moon, Sun, Monitor, Shield, Save, User, Zap, MessageSquare, Crown } from 'lucide-react';
+import { Bell, Lock, Eye, Moon, Sun, Monitor, Shield, Save, User, Zap, MessageSquare, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';

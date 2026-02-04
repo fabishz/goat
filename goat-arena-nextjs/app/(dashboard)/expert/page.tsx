@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { Star, MessageSquare, Award, TrendingUp, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { Star, MessageSquare, Award, TrendingUp, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function ExpertDashboardPage() {
@@ -16,10 +15,18 @@ export default function ExpertDashboardPage() {
                     <h1 className="text-4xl font-serif font-bold mb-2">Expert <span className="gold-text">Hub</span></h1>
                     <p className="text-muted-foreground text-lg">Your expert takes shape the history of the Arena.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-8">
                     <div className="text-right">
                         <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Expert Rank</div>
                         <div className="text-2xl font-serif font-bold gold-text">#14 Global</div>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Influence Power</div>
+                        <div className="text-2xl font-serif font-bold text-blue-400">2.5x</div>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Consistency</div>
+                        <div className="text-2xl font-serif font-bold text-green-400">94%</div>
                     </div>
                 </div>
             </div>

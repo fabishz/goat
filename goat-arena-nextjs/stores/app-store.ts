@@ -29,12 +29,16 @@ interface AppState {
     reason: string;
   };
 
+  // Onboarding
+  isOnboardingCompleted: boolean;
+
   // Actions
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   login: (token: string, user: User) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  completeOnboarding: () => void;
   setDomain: (domain: Domain | null) => void;
   setEras: (eras: Era[]) => void;
   setRegion: (region: string | null) => void;
@@ -68,6 +72,7 @@ export const useAppStore = create<AppState>((set) => ({
     step: 1,
     reason: '',
   },
+  isOnboardingCompleted: typeof window !== 'undefined' ? localStorage.getItem('onboarding_completed') === 'true' : false,
 
   // Actions
   setUser: (user) => set({ user, isAuthenticated: !!user }),
@@ -95,33 +100,48 @@ export const useAppStore = create<AppState>((set) => ({
     }
 
     try {
-      // In a real app, we would call GET /me here
-      // For now, we'll simulate it if we have a token
-      // const response = await fetch('/api/v1/auth/me', { headers: { Authorization: `Bearer ${token}` } });
-      // const user = await response.json();
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      // Mocking successful auth check
-      const mockUser: User = {
-        id: '1',
-        email: 'john@example.com',
-        name: 'John Champion',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-        level: 42,
-        contributionPoints: 1250,
-        accuracyScore: 88,
-        influenceWeight: 2.5,
-        votesCount: 156,
-        debatesJoined: 24,
+      if (!response.ok) {
+        throw new Error('Unauthorized');
+      }
+
+      const backendUser = await response.json();
+
+      // Map backend user to frontend User interface
+      const user: User = {
+        id: backendUser.id,
+        email: backendUser.email,
+        name: backendUser.full_name || backendUser.email.split('@')[0],
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${backendUser.id}`,
+        level: 1, // Default for now
+        contributionPoints: 0,
+        accuracyScore: 0,
+        influenceWeight: backendUser.role === 'expert' ? 2.5 : 1.0,
+        votesCount: 0,
+        debatesJoined: 0,
+        achievements: [],
         badges: [],
-        role: 'admin'
+        role: backendUser.role as 'user' | 'expert' | 'admin',
       };
 
-      set({ user: mockUser, isAuthenticated: true, isInitializing: false });
+      set({ user, isAuthenticated: true, isInitializing: false, token });
     } catch (error) {
+      console.error("Auth check failed:", error);
       localStorage.removeItem('arena_token');
       set({ token: null, user: null, isAuthenticated: false, isInitializing: false });
     }
   },
+  completeOnboarding: () => {
+    localStorage.setItem('onboarding_completed', 'true');
+    set({ isOnboardingCompleted: true });
+  },
+
   setDomain: (domain) => set({ selectedDomain: domain }),
   setEras: (eras) => set({ selectedEras: eras }),
   setRegion: (region) => set({ selectedRegion: region }),

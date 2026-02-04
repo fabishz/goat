@@ -18,6 +18,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAppStore } from '@/stores/app-store';
 import { Shield, Award } from 'lucide-react';
+import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
+import NextImage from 'next/image';
 
 interface DashboardLayoutProps {
     children: ReactNode;
@@ -26,7 +28,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, isInitializing, isAuthenticated } = useAppStore();
+    const { user, isInitializing, isAuthenticated, isOnboardingCompleted } = useAppStore();
 
     useEffect(() => {
         if (!isInitializing && !isAuthenticated) {
@@ -69,6 +71,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     return (
         <div className="min-h-screen flex bg-background">
+            {!isOnboardingCompleted && <OnboardingWizard />}
             {/* Dashboard Sidebar */}
             <aside className="w-64 border-r border-border/50 bg-card/30 backdrop-blur-xl hidden md:flex flex-col sticky top-0 h-screen">
                 <div className="p-6 border-b border-border/50">
@@ -130,7 +133,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <div className="w-10 h-10 rounded-full border-2 border-accent/20 p-0.5">
                             <div className="w-full h-full rounded-full bg-secondary overflow-hidden relative">
                                 {user?.avatar ? (
-                                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                                    <NextImage src={user.avatar} alt={user.name || 'User'} fill className="object-cover" />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center text-xs font-bold">
                                         {user?.name?.charAt(0) || 'G'}

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Crown, TrendingUp, Users, Award, ChevronRight, Sparkles, Star } from 'lucide-react';
+import { Crown, TrendingUp, Users, Award, ChevronRight, Star } from 'lucide-react';
 import { GoatCard } from '@/components/cards/GoatCard';
 import { DebateCard } from '@/components/cards/DebateCard';
 import { ExpertCard } from '@/components/cards/ExpertCard';

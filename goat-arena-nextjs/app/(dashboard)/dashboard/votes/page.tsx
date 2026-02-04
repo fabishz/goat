@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Vote, Calendar, TrendingUp, Award, ChevronRight, Search, Filter } from 'lucide-react';
+import { Vote, Calendar, TrendingUp, ChevronRight, Search, Filter } from 'lucide-react';
 import { goats } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,12 +10,26 @@ import NextImage from 'next/image';
 import Link from 'next/link';
 
 export default function VotesPage() {
-    // Simulate user's voted goats
-    const votedGoats = goats.slice(0, 5).map((goat, i) => ({
-        ...goat,
-        votedAt: new Date(Date.now() - i * 86400000 * 2).toLocaleDateString(),
-        impact: (Math.random() * 5 + 1).toFixed(1),
-    }));
+    const [votedGoats, setVotedGoats] = useState<{
+        id: string;
+        name: string;
+        image: string;
+        subdomain: string;
+        categoryId: string;
+        rank: number;
+        votedAt: string;
+        impact: string;
+    }[]>([]);
+
+    useEffect(() => {
+        const data = goats.slice(0, 5).map((goat, i) => ({
+            ...goat,
+            votedAt: new Date(Date.now() - i * 86400000 * 2).toLocaleDateString(),
+            impact: (Math.random() * 5 + 1).toFixed(1),
+        }));
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setVotedGoats(data);
+    }, []);
 
     return (
         <div className="p-8 max-w-6xl mx-auto">

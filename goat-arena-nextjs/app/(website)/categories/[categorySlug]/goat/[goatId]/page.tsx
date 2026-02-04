@@ -24,7 +24,7 @@ export default function GoatProfile() {
     const params = useParams();
     const goatId = params?.goatId as string;
     const categorySlug = params?.categorySlug as string;
-    const { addToCompare, compareGoats, setCurrentCategory } = useAppStore();
+    const { addToCompare, compareGoats } = useAppStore();
 
     const goat = goats.find(g => String(g.id) === String(goatId));
 

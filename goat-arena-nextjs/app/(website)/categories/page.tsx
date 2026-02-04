@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { goats, domains, eras } from '@/lib/mock-data';
 import { useAppStore } from '@/stores/app-store';
-import { Domain, Era, Region } from '@/types/goat';
+import { Domain, Era } from '@/types/goat';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/use-categories';
 import NextImage from 'next/image';

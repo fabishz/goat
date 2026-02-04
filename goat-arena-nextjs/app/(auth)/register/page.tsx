@@ -6,15 +6,64 @@ import { Mail, Lock, User, ArrowRight, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAppStore } from '@/stores/app-store';
 
 export default function RegisterPage() {
+    const { checkAuth } = useAppStore();
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulate registration
-        setTimeout(() => setIsLoading(false), 2000);
+        setError(null);
+
+        const formData = new FormData(e.target as HTMLFormElement);
+        const name = formData.get('name') as string;
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            const response = await fetch(`${apiUrl}/users/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    full_name: name,
+                }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                // Handle Pydantic validation errors or direct detail strings
+                const errorMessage = Array.isArray(data.detail)
+                    ? data.detail[0].msg
+                    : (data.detail || 'Registration failed');
+                throw new Error(errorMessage);
+            }
+
+            // Success - automatically login
+            const loginRes = await fetch(`${apiUrl}/auth/login/access-token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    username: email,
+                    password: password,
+                }),
+            });
+
+            const { access_token } = await loginRes.json();
+            localStorage.setItem('arena_token', access_token);
+            await checkAuth();
+            router.push('/dashboard');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Registration failed');
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -29,11 +78,17 @@ export default function RegisterPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+                {error && (
+                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-bold text-center">
+                        {error}
+                    </div>
+                )}
                 <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Full Name</label>
                     <div className="relative">
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
+                            name="name"
                             type="text"
                             placeholder="John Champion"
                             className="pl-12 bg-background/50 border-border/50 h-12 rounded-xl focus:ring-accent/50"
@@ -47,6 +102,7 @@ export default function RegisterPage() {
                     <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
+                            name="email"
                             type="email"
                             placeholder="name@example.com"
                             className="pl-12 bg-background/50 border-border/50 h-12 rounded-xl focus:ring-accent/50"
@@ -60,6 +116,7 @@ export default function RegisterPage() {
                     <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
+                            name="password"
                             type="password"
                             placeholder="••••••••"
                             className="pl-12 bg-background/50 border-border/50 h-12 rounded-xl focus:ring-accent/50"

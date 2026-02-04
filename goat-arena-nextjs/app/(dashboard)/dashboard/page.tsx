@@ -3,17 +3,14 @@
 
 import {
     Award, Vote, History, Star,
-    Settings, LogOut, Zap,
     Target, PieChart as PieChartIcon,
-    ShieldCheck, Activity, MessageSquare
+    Activity, MessageSquare
 } from 'lucide-react';
 
 import { AnimatedCounter } from '@/components/animations/AnimatedCounter';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { currentUser } from '@/lib/mock-data';
-
-import NextImage from 'next/image';
+import { useAppStore } from '@/stores/app-store';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid,
     Tooltip, ResponsiveContainer, Cell,
@@ -21,7 +18,9 @@ import {
 } from 'recharts';
 
 export default function DashboardPage() {
-    const user = currentUser;
+    const { user } = useAppStore();
+
+    if (!user) return null;
 
     const accuracyData = [
         { month: 'Jan', accuracy: 75 },

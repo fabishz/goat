@@ -1,20 +1,34 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare, ThumbsUp, ThumbsDown, Calendar, ArrowRight, TrendingUp, Search } from 'lucide-react';
-import { debates, goats } from '@/lib/mock-data';
+import { debates } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import NextImage from 'next/image';
 import Link from 'next/link';
 
 export default function DebatesPage() {
-    // Simulate user's debates
-    const userDebates = debates.map((debate, i) => ({
-        ...debate,
-        userArgument: debate.arguments[0],
-        participationDate: new Date(Date.now() - i * 86400000 * 3).toLocaleDateString(),
-    }));
+    const [userDebates, setUserDebates] = useState<{
+        id: string;
+        title: string;
+        comments: number;
+        participationDate: string;
+        goat1: { image: string; name: string; categoryId: string };
+        goat2: { image: string; name: string };
+        userArgument: { content: string; upvotes: number; downvotes: number };
+    }[]>([]);
+
+    useEffect(() => {
+        const data = debates.map((debate, i) => ({
+            ...debate,
+            userArgument: debate.arguments[0],
+            participationDate: new Date(Date.now() - i * 86400000 * 3).toLocaleDateString(),
+        }));
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setUserDebates(data);
+    }, []);
 
     return (
         <div className="p-8 max-w-6xl mx-auto">

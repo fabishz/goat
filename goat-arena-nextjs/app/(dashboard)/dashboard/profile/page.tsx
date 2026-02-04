@@ -100,7 +100,7 @@ export default function ProfilePage() {
                             <div className="pt-6 border-t border-border/50">
                                 <h4 className="text-sm font-bold uppercase tracking-widest mb-4">Bio</h4>
                                 <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Passionate sports and music historian. I've been following the GOAT debates for over a decade, focusing on statistical dominance and cultural impact.
+                                    Passionate sports and music historian. I&apos;ve been following the GOAT debates for over a decade, focusing on statistical dominance and cultural impact.
                                 </p>
                             </div>
                         </div>
