@@ -8,7 +8,7 @@ from app.schemas.fan_voting import FanVote, FanVoteCreate
 from app.services.category import category_service
 from app.services.entity import entity_service
 from app.services.fan_voting import fan_voting_service
-from app.api import deps
+from app.api.v1 import deps
 from app.models.user import User
 
 router = APIRouter()
@@ -27,7 +27,8 @@ def read_categories(
 def create_category(
     *,
     db: Session = Depends(get_db),
-    category_in: CategoryCreate
+    category_in: CategoryCreate,
+    current_user: User = Depends(deps.RoleChecker(["admin"]))
 ):
     return category_service.create_category(db, category_in=category_in)
 
@@ -48,7 +49,8 @@ def update_category(
     *,
     db: Session = Depends(get_db),
     category_id: UUID,
-    category_in: CategoryUpdate
+    category_in: CategoryUpdate,
+    current_user: User = Depends(deps.RoleChecker(["admin"]))
 ):
     category = category_service.update_category(
         db, category_id=category_id, category_in=category_in
@@ -60,8 +62,10 @@ def update_category(
 
 @router.delete("/{category_id}", response_model=Category)
 def delete_category(
+    *,
+    db: Session = Depends(get_db),
     category_id: UUID,
-    db: Session = Depends(get_db)
+    current_user: User = Depends(deps.RoleChecker(["admin"]))
 ):
     category = category_service.delete_category(db, category_id=category_id)
     if not category:

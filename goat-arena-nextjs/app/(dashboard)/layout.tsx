@@ -28,7 +28,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, isInitializing, isAuthenticated, isOnboardingCompleted } = useAppStore();
+    const { user, isInitializing, isAuthenticated, isOnboardingCompleted, logout } = useAppStore();
 
     useEffect(() => {
         if (!isInitializing && !isAuthenticated) {
@@ -114,7 +114,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             <span>Back to Website</span>
                         </Button>
                     </Link>
-                    <Button variant="ghost" className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive mt-2">
+                    <Button
+                        variant="ghost"
+                        className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive mt-2"
+                        onClick={() => {
+                            logout();
+                            router.push('/login');
+                        }}
+                    >
                         <LogOut className="w-4 h-4" />
                         <span>Sign Out</span>
                     </Button>
