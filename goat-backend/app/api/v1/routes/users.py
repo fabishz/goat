@@ -31,7 +31,7 @@ def create_user(
         email=user_in.email,
         hashed_password=security.get_password_hash(user_in.password),
         full_name=user_in.full_name,
-        role=user_in.role or "user",
+        role="user",
         is_active=True
     )
     db.add(db_user)

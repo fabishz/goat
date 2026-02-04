@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.core import Entity, EntityCreate, EntityUpdate
 from app.services.entity import entity_service
+from app.api.v1 import deps
+from app.models.user import User
 
 router = APIRouter()
 
@@ -25,7 +27,8 @@ def read_entities(
 def create_entity(
     *,
     db: Session = Depends(get_db),
-    entity_in: EntityCreate
+    entity_in: EntityCreate,
+    current_user: User = Depends(deps.RoleChecker(["admin"]))
 ):
     return entity_service.create_entity(db, entity_in=entity_in)
 
@@ -49,7 +52,8 @@ def update_entity(
     *,
     db: Session = Depends(get_db),
     entity_id: UUID,
-    entity_in: EntityUpdate
+    entity_in: EntityUpdate,
+    current_user: User = Depends(deps.RoleChecker(["admin"]))
 ):
     entity = entity_service.update_entity(
         db, entity_id=entity_id, entity_in=entity_in
@@ -62,7 +66,8 @@ def update_entity(
 @router.delete("/{entity_id}", response_model=Entity)
 def delete_entity(
     entity_id: UUID,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.RoleChecker(["admin"]))
 ):
     entity = entity_service.delete_entity(db, entity_id=entity_id)
     if not entity:
