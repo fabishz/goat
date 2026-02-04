@@ -19,7 +19,7 @@ class Expert(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     bio: Mapped[str] = mapped_column(Text, nullable=True)
     credentials: Mapped[str] = mapped_column(Text, nullable=True)
-    verification_status: Mapped[bool] = mapped_column(Boolean, default=False)
+    verification_status: Mapped[bool] = mapped_column(Boolean, default=True)
     reputation_score: Mapped[float] = mapped_column(Float, default=1.0)  # Baseline 1.0
     role: Mapped[ExpertRole] = mapped_column(String(20), default=ExpertRole.EXPERT)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

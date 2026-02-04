@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str
+    DATABASE_POOL_SIZE: int = 5
+    DATABASE_MAX_OVERFLOW: int = 10
     
     # Security
     SECRET_KEY: str

@@ -8,8 +8,8 @@ from app.core.config import settings
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
+    pool_size=settings.DATABASE_POOL_SIZE,
+    max_overflow=settings.DATABASE_MAX_OVERFLOW,
     connect_args={"sslmode": "require"} if "localhost" not in settings.DATABASE_URL or "127.0.0.1" not in settings.DATABASE_URL else {}
 )
 
