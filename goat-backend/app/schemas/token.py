@@ -1,3 +1,4 @@
+import uuid
 from pydantic import BaseModel
 
 class Token(BaseModel):
@@ -5,4 +6,4 @@ class Token(BaseModel):
     token_type: str
 
 class TokenPayload(BaseModel):
-    sub: str | None = None
+    sub: uuid.UUID | None = None

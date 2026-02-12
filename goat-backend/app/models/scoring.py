@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from sqlalchemy import String, Text, ForeignKey, Float, JSON, Integer, Boolean, DateTime, func
+from sqlalchemy import String, Text, ForeignKey, Float, JSON, Integer, Boolean, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 from app.models.base import UUIDMixin, TimestampMixin, SoftDeleteMixin
@@ -73,7 +73,9 @@ class RawScore(Base, UUIDMixin, TimestampMixin):
         ForeignKey("scoring_components.id", ondelete="CASCADE"), nullable=False
     )
     value: Mapped[float] = mapped_column(Float, nullable=False)
-    era_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # For era normalization
+    era_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        ForeignKey("eras.id", ondelete="SET NULL"), nullable=True
+    )  # For era normalization
 
 
 class FinalScore(Base, UUIDMixin, TimestampMixin):
@@ -91,6 +93,10 @@ class FinalScore(Base, UUIDMixin, TimestampMixin):
 
     scoring_model: Mapped["ScoringModel"] = relationship("ScoringModel", back_populates="final_scores")
     entity: Mapped["Entity"] = relationship("Entity")
+
+    __table_args__ = (
+        UniqueConstraint("entity_id", "scoring_model_id", name="uq_final_scores_entity_model"),
+    )
 
 
 class RankingSnapshot(Base, UUIDMixin, TimestampMixin):

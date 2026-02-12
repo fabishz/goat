@@ -62,7 +62,7 @@ class RawScoreCreate(ScoringBase):
     entity_id: UUID
     component_id: UUID
     value: float
-    era_id: Optional[str] = None
+    era_id: Optional[UUID] = None
 
 
 class FinalScoreResponse(ScoringBase):

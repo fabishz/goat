@@ -13,3 +13,5 @@ class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
     role: Mapped[str] = mapped_column(String(50), default="user") # user, expert, admin
+    onboarding_status: Mapped[str] = mapped_column(String(32), default="not_started")
+    onboarding_step: Mapped[int] = mapped_column(default=0)

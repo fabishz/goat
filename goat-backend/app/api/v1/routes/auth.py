@@ -2,6 +2,7 @@ from datetime import timedelta
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.api.v1 import deps
 from app.api.v1.middleware.security import limiter
@@ -23,9 +24,22 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not security.verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    email = form_data.username.strip().lower()
+    user = (
+        db.query(User)
+        .filter(func.lower(User.email) == email, User.deleted_at.is_(None))
+        .first()
+    )
+    password_ok = security.verify_password(
+        form_data.password,
+        user.hashed_password if user else security.DUMMY_PASSWORD_HASH,
+    )
+    if not user or not password_ok:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     

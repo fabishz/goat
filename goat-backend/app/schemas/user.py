@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, ConfigDict, field_validator
 import re
@@ -30,5 +30,15 @@ class User(UserBase):
     id: UUID
     is_active: bool
     is_superuser: bool
+    onboarding_status: Literal["not_started", "in_progress", "completed"]
+    onboarding_step: int
     
     model_config = ConfigDict(from_attributes=True)
+
+class UserOnboarding(BaseModel):
+    status: Literal["not_started", "in_progress", "completed"]
+    step: int
+
+class UserOnboardingUpdate(BaseModel):
+    status: Optional[Literal["not_started", "in_progress", "completed"]] = None
+    step: Optional[int] = None

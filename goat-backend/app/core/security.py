@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+DUMMY_PASSWORD_HASH = pwd_context.hash("not_the_password")
 
 
 def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
