@@ -12,8 +12,8 @@ def health_check(db: Session = Depends(get_db)):
         # Test database connection
         db.execute(text("SELECT 1"))
         db_status = "connected"
-    except Exception as e:
-        db_status = f"disconnected: {str(e)}"
+    except Exception:
+        db_status = "disconnected"
     
     return {
         "status": "healthy",

@@ -10,7 +10,9 @@ engine = create_engine(
     pool_pre_ping=True,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
-    connect_args={"sslmode": "require"} if "localhost" not in settings.DATABASE_URL or "127.0.0.1" not in settings.DATABASE_URL else {}
+    connect_args={"sslmode": "require"}
+    if "localhost" not in settings.DATABASE_URL and "127.0.0.1" not in settings.DATABASE_URL
+    else {},
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

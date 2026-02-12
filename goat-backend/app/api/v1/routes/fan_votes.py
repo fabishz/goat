@@ -1,17 +1,17 @@
-from typing import List
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.fan_voting import FanVote, FanVoteCreate, FanVoteAggregate
 from app.services.fan_voting import fan_voting_service
 from app.services.entity import entity_service
-from app.models.fan_voting import FanVote as FanVoteDB, FanVoteAggregate as FanVoteAggregateDB
+from app.models.fan_voting import FanVoteAggregate as FanVoteAggregateDB
 
 router = APIRouter()
 
 
-from app.api import deps
+from app.api.v1 import deps
 from app.models.user import User
 
 @router.post("/", response_model=FanVote)

@@ -77,7 +77,7 @@ def submit_raw_score(
     return {"message": "Raw score submitted successfully"}
 
 
-from app.api import deps
+from app.api.v1 import deps
 from app.models.user import User
 
 @router.post("/run/{category_id}", response_model=List[FinalScoreResponse])

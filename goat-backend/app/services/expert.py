@@ -3,12 +3,18 @@ from uuid import UUID
 from sqlalchemy import select, func, and_
 from sqlalchemy.orm import Session
 from app.models.expert import Expert, ExpertDomain, ExpertVote, ExpertReputationEvent, ConflictDisclosure, ExpertRole
+from app.models.user import User
 from app.schemas.expert import ExpertCreate, ExpertVoteCreate, ConflictDisclosureCreate
 
 
 class ExpertService:
     def create_expert(self, db: Session, expert_in: ExpertCreate) -> Expert:
+        user = db.get(User, expert_in.user_id)
+        if not user:
+            raise ValueError("Linked user not found")
+
         db_expert = Expert(
+            user_id=expert_in.user_id,
             name=expert_in.name,
             bio=expert_in.bio,
             credentials=expert_in.credentials,

@@ -19,6 +19,7 @@ class ExpertDomain(ExpertDomainBase):
     id: UUID
 
 class ExpertCreate(ExpertBase):
+    user_id: UUID
     name: str
     bio: Optional[str] = None
     credentials: Optional[str] = None
@@ -34,6 +35,7 @@ class ExpertUpdate(ExpertBase):
 
 class Expert(ExpertBase):
     id: UUID
+    user_id: Optional[UUID] = None
     name: str
     bio: Optional[str] = None
     verification_status: bool

@@ -44,9 +44,16 @@ def test_password_complexity():
 def test_rate_limiting_login(client):
     # The limit is 5/minute
     for _ in range(5):
-        client.post("/api/v1/auth/login/access-token", data={"username": "test@example.com", "password": "any"})
+        response = client.post(
+            "/api/v1/auth/login/access-token",
+            data={"username": "test@example.com", "password": "wrong-password"},
+        )
+        assert response.status_code in (400, 401)
     
     # 6th request should be rate limited
-    response = client.post("/api/v1/auth/login/access-token", data={"username": "test@example.com", "password": "any"})
+    response = client.post(
+        "/api/v1/auth/login/access-token",
+        data={"username": "test@example.com", "password": "wrong-password"},
+    )
     assert response.status_code == 429
     assert "Rate limit exceeded" in response.text

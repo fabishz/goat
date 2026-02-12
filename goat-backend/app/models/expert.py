@@ -16,6 +16,11 @@ class ExpertRole(str, enum.Enum):
 class Expert(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "experts"
 
+    user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        unique=True,
+        nullable=True,
+    )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     bio: Mapped[str] = mapped_column(Text, nullable=True)
     credentials: Mapped[str] = mapped_column(Text, nullable=True)

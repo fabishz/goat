@@ -1,4 +1,5 @@
 import pytest
+from tests.conftest import TEST_EXPERT_USER_ID
 
 def test_full_goat_flow(client):
     """
@@ -52,7 +53,11 @@ def test_full_goat_flow(client):
     
     # 5. Submit Expert Vote (Weight 20%)
     expert_res = client.post("/api/v1/experts/", json={
-        "name": "Expert", "bio": "Verified expert", "role": "expert", "domains": [{"category_id": cat_id, "expertise_level": 1.0}]
+        "user_id": str(TEST_EXPERT_USER_ID),
+        "name": "Expert",
+        "bio": "Verified expert",
+        "role": "expert",
+        "domains": [{"category_id": cat_id, "expertise_level": 1.0}]
     })
     assert expert_res.status_code == 200, f"Expert creation failed: {expert_res.text}"
     expert_id = expert_res.json()["id"]

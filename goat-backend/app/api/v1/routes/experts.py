@@ -1,6 +1,6 @@
 from typing import List
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.expert import Expert, ExpertCreate, ExpertUpdate, ExpertVote, ExpertVoteCreate, ConflictDisclosure, ConflictDisclosureCreate
@@ -16,7 +16,10 @@ def create_expert(
     db: Session = Depends(get_db),
     expert_in: ExpertCreate
 ):
-    return expert_service.create_expert(db, expert_in=expert_in)
+    try:
+        return expert_service.create_expert(db, expert_in=expert_in)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/{expert_id}", response_model=Expert)
@@ -51,7 +54,7 @@ def update_expert(
     return db_obj
 
 
-from app.api import deps
+from app.api.v1 import deps
 from app.models.user import User
 
 @router.post("/{expert_id}/votes", response_model=ExpertVote)
@@ -61,19 +64,19 @@ def cast_vote(
     db: Session = Depends(get_db),
     current_user: User = Depends(deps.get_current_expert)
 ):
-    # Verify the authenticated user is the expert they claim to be
-    # For V1, we assume User.id maps to Expert.id or we add a link.
-    # Given the current schema, Expert is separate. We need to link them.
-    # For now, let's assume the User IS the Expert (same ID) or we just check role.
-    # Ideally, User has a foreign key to Expert, or Expert has a foreign key to User.
-    # Since we just added User, let's assume for V1 that we check if current_user.role == 'expert'.
-    # And we might need to look up the Expert record associated with this User.
-    # For this gap closure, we will enforce that the user has the 'expert' role.
-    
-    # In a real production app, we'd link User -> Expert.
-    # Here, we'll verify the role.
-    
-    return expert_service.submit_vote(db, expert_id, vote_in)
+    expert = db.get(ExpertDB, expert_id)
+    if not expert:
+        raise HTTPException(status_code=404, detail="Expert not found")
+    if not current_user.is_superuser and expert.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only vote as your linked expert profile",
+        )
+
+    try:
+        return expert_service.submit_vote(db, expert_id, vote_in)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/{expert_id}/disclosures", response_model=ConflictDisclosure)
@@ -81,8 +84,18 @@ def create_disclosure(
     *,
     db: Session = Depends(get_db),
     expert_id: UUID,
-    disclosure_in: ConflictDisclosureCreate
+    disclosure_in: ConflictDisclosureCreate,
+    current_user: User = Depends(deps.get_current_expert),
 ):
+    expert = db.get(ExpertDB, expert_id)
+    if not expert:
+        raise HTTPException(status_code=404, detail="Expert not found")
+    if not current_user.is_superuser and expert.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only disclose conflicts for your linked expert profile",
+        )
+
     db_obj = ConflictDisclosureDB(
         expert_id=expert_id,
         **disclosure_in.model_dump()
