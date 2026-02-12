@@ -12,6 +12,11 @@ def test_auth_dependency_aliases_stay_in_sync():
         legacy_deps.get_current_active_superuser
         is v1_deps.get_current_active_superuser
     )
+    assert legacy_deps.reusable_oauth2 is v1_deps.reusable_oauth2
+    assert (
+        v1_deps.reusable_oauth2.model.flows.password.tokenUrl
+        == "/api/v1/auth/login/access-token"
+    )
 
 
 def test_fan_vote_aggregate_endpoint_returns_computed_aggregate(client, db):
