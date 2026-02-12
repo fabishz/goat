@@ -58,3 +58,14 @@ def test_fan_vote_aggregate_endpoint_returns_computed_aggregate(client, db):
     assert aggregate["vote_count"] == 1
     # Service scales 1-10 ratings to 0-100.
     assert aggregate["aggregate_score"] == 70.0
+
+
+def test_fan_vote_aggregate_endpoint_returns_404_when_missing(client):
+    missing_entity_id = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+    missing_category_id = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+
+    aggregate_res = client.get(
+        f"/api/v1/fan-votes/aggregates/{missing_entity_id}/{missing_category_id}"
+    )
+    assert aggregate_res.status_code == 404
+    assert aggregate_res.json()["detail"] == "Aggregate not found"

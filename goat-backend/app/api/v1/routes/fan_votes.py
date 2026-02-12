@@ -18,7 +18,7 @@ from app.models.user import User
 def submit_fan_vote(
     vote_in: FanVoteCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_active_user)
 ):
     # Validate that the GOAT belongs to the category
     goat = entity_service.get_entity(db, entity_id=vote_in.entity_id)
