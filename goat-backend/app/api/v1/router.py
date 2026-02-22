@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.routes import health, categories, subcategories, entities, scoring, experts, fan_votes, eras, influence, auth, users, audit_logs
+from app.api.v1.routes import health, categories, subcategories, entities, scoring, experts, fan_votes, eras, influence, auth, users, audit_logs, debates, debate_arguments
 
 api_router = APIRouter()
 
@@ -15,3 +15,5 @@ api_router.include_router(fan_votes.router, prefix="/fan-votes", tags=["fan-vote
 api_router.include_router(eras.router, prefix="/eras", tags=["eras"])
 api_router.include_router(influence.router, prefix="/influence", tags=["influence"])
 api_router.include_router(audit_logs.router, prefix="/audit-logs", tags=["audit-logs"])
+api_router.include_router(debates.router, prefix="/debates", tags=["debates"])
+api_router.include_router(debate_arguments.router, prefix="/debates", tags=["debate-arguments"])

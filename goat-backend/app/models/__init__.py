@@ -49,6 +49,8 @@ from app.models.influence import (
 )
 from app.models.user import User
 from app.models.audit_log import AuditLog
+from app.models.debate import Debate
+from app.models.debate_argument import DebateArgument
 
 __all__ = [
     "Base",
@@ -87,4 +89,6 @@ __all__ = [
     "InfluenceScore",
     "User",
     "AuditLog",
+    "Debate",
+    "DebateArgument",
 ]
