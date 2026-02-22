@@ -24,11 +24,13 @@ export function useCategory(slug: string) {
         queryKey: ['category', slug],
         queryFn: async () => {
             try {
-                const { data } = await api.get<Category>(`/categories/${slug}`);
-                return data;
+                const { data } = await api.get<Category[]>('/categories');
+                const category = data.find((c) => c.slug === slug);
+                if (!category) throw new Error(`Category not found: ${slug}`);
+                return category;
             } catch (error) {
                 console.warn('Using mock category data: API unavailable');
-                const category = mockCategories.find(c => c.slug === slug);
+                const category = mockCategories.find((c) => c.slug === slug);
                 if (!category) throw new Error(`Category not found: ${slug}`);
                 return category;
             }

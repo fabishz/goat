@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Literal
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, ConfigDict, field_validator
@@ -32,7 +33,12 @@ class User(UserBase):
     is_superuser: bool
     onboarding_status: Literal["not_started", "in_progress", "completed"]
     onboarding_step: int
-    
+    # AAA fields
+    email_verified: bool = False
+    avatar_url: Optional[str] = None
+    last_login_at: Optional[datetime] = None
+    login_count: int = 0
+
     model_config = ConfigDict(from_attributes=True)
 
 class UserOnboarding(BaseModel):

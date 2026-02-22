@@ -11,12 +11,15 @@ import { useDebates, useTrendingDebates } from '@/hooks/use-debates';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import NextImage from 'next/image';
 import { AuthActionGate } from '@/components/auth/AuthActionGate';
+import { useCategory } from '@/hooks/use-categories';
 
 export default function DebatesPage() {
     const params = useParams();
     const categorySlug = params?.categorySlug as string;
-    const { data: allDebates, isLoading: debatesLoading } = useDebates(categorySlug);
-    const { data: trendingDebates, isLoading: trendingLoading } = useTrendingDebates(categorySlug);
+    const { data: category } = useCategory(categorySlug);
+    const categoryId = category?.id;
+    const { data: allDebates, isLoading: debatesLoading } = useDebates(categoryId);
+    const { data: trendingDebates, isLoading: trendingLoading } = useTrendingDebates(categoryId);
 
     return (
         <div className="min-h-screen pb-20">

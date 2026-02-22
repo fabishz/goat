@@ -48,6 +48,7 @@ from app.models.influence import (
     InfluenceScore
 )
 from app.models.user import User
+from app.models.audit_log import AuditLog
 
 __all__ = [
     "Base",
@@ -85,4 +86,5 @@ __all__ = [
     "InfluenceModel",
     "InfluenceScore",
     "User",
+    "AuditLog",
 ]

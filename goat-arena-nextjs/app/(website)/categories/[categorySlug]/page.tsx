@@ -21,12 +21,13 @@ export default function CategoryPage() {
     const { setCurrentCategory } = useAppStore();
 
     const { data: category, isLoading: categoryLoading } = useCategory(categorySlug);
-    const { data: categoryGoats, isLoading: goatsLoading } = useGoats(categorySlug);
+    const categoryId = category?.id;
+    const { data: categoryGoats, isLoading: goatsLoading } = useGoats(categoryId);
 
     useEffect(() => {
-        if (categorySlug) setCurrentCategory(categorySlug);
+        if (categoryId) setCurrentCategory(categoryId);
         return () => setCurrentCategory(null);
-    }, [categorySlug, setCurrentCategory]);
+    }, [categoryId, setCurrentCategory]);
 
     const topGoats = [...(categoryGoats || [])].sort((a, b) => b.overallScore - a.overallScore);
     const featuredGoats = topGoats.slice(0, 2);

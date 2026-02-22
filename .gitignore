@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+/build/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# env files
+.env*
+
+# logs
+*.log
+
+# OS
+.DS_Store
+
+# coverage
+coverage/
+
+# tooling
+*.tsbuildinfo

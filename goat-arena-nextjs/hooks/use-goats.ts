@@ -3,32 +3,43 @@ import { api } from '@/lib/api';
 import { Goat } from '@/types/goat';
 import { goats as mockGoats } from '@/lib/mock-data';
 
+function filterTrending(goats: Goat[]) {
+    return goats.filter((g) => g.trending);
+}
+
 export function useGoats(categoryId?: string) {
     return useQuery({
         queryKey: ['goats', categoryId],
         queryFn: async () => {
             try {
-                const params = categoryId ? { categoryId } : {};
-                const { data } = await api.get<Goat[]>('/goats', { params });
+                if (categoryId) {
+                    const { data } = await api.get<Goat[]>(`/categories/${categoryId}/goats`);
+                    return data;
+                }
+                const { data } = await api.get<Goat[]>('/entities');
                 return data;
             } catch (error) {
                 console.warn('Using mock goats data: API unavailable');
-                return categoryId ? mockGoats.filter(g => g.categoryId === categoryId) : mockGoats;
+                return categoryId ? mockGoats.filter((g) => g.categoryId === categoryId) : mockGoats;
             }
         },
     });
 }
 
-export function useGoat(id: string) {
+export function useGoat(id: string, categoryId?: string) {
     return useQuery({
-        queryKey: ['goat', id],
+        queryKey: ['goat', id, categoryId],
         queryFn: async () => {
             try {
-                const { data } = await api.get<Goat>(`/goats/${id}`);
+                if (categoryId) {
+                    const { data } = await api.get<Goat>(`/categories/${categoryId}/goats/${id}`);
+                    return data;
+                }
+                const { data } = await api.get<Goat>(`/entities/${id}`);
                 return data;
             } catch (error) {
                 console.warn('Using mock goat data: API unavailable');
-                const goat = mockGoats.find(g => g.id === id);
+                const goat = mockGoats.find((g) => g.id === id);
                 if (!goat) throw new Error(`Goat not found: ${id}`);
                 return goat;
             }
@@ -42,12 +53,17 @@ export function useTrendingGoats(categoryId?: string) {
         queryKey: ['goats', 'trending', categoryId],
         queryFn: async () => {
             try {
-                const params = { trending: true, ...(categoryId ? { categoryId } : {}) };
-                const { data } = await api.get<Goat[]>('/goats', { params });
-                return data;
+                if (categoryId) {
+                    const { data } = await api.get<Goat[]>(`/categories/${categoryId}/goats`);
+                    return filterTrending(data);
+                }
+                const { data } = await api.get<Goat[]>('/entities');
+                return filterTrending(data);
             } catch (error) {
                 console.warn('Using mock trending goats: API unavailable');
-                const filtered = categoryId ? mockGoats.filter(g => g.categoryId === categoryId && g.trending) : mockGoats.filter(g => g.trending);
+                const filtered = categoryId
+                    ? mockGoats.filter((g) => g.categoryId === categoryId && g.trending)
+                    : filterTrending(mockGoats);
                 return filtered;
             }
         },

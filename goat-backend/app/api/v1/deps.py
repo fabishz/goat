@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Generator, List
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -40,6 +41,14 @@ def get_current_user(
     )
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    # --- Account lockout check (Accounting/Security) ---
+    if user.lockout_until and user.lockout_until > datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is temporarily locked. Please try again later.",
+        )
+
     return user
 
 def get_current_active_user(
@@ -69,7 +78,27 @@ def get_current_expert(
         )
     return current_user
 
+def get_current_moderator(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
+    """Allow moderators AND superusers/admins."""
+    if current_user.role not in ("moderator", "admin") and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Moderator or admin access required",
+        )
+    return current_user
+
 class RoleChecker:
+    """Dependency that restricts a route to specific roles.
+
+    Usage::
+
+        @router.get("/admin-only")
+        def admin_route(user = Depends(RoleChecker(["admin"]))):
+            ...
+    """
+
     def __init__(self, allowed_roles: List[str]):
         self.allowed_roles = allowed_roles
 
@@ -79,6 +108,6 @@ class RoleChecker:
         if user.role not in self.allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="The user doesn't have enough privileges",
+                detail=f"Access requires one of the following roles: {', '.join(self.allowed_roles)}",
             )
         return user

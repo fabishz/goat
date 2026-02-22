@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Github, Chrome } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Chrome } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
@@ -121,12 +121,8 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" className="h-12 border-border/50 rounded-xl hover:bg-accent/5">
-                    <Github className="w-4 h-4 mr-2" />
-                    Github
-                </Button>
-                <Button variant="outline" className="h-12 border-border/50 rounded-xl hover:bg-accent/5">
+            <div className="flex justify-center">
+                <Button variant="outline" className="w-full h-12 border-border/50 rounded-xl hover:bg-accent/5">
                     <Chrome className="w-4 h-4 mr-2" />
                     Google
                 </Button>
