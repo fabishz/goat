@@ -8,6 +8,7 @@ from app.core.config import settings
 from app.core.logging import setup_logging
 from app.api.v1.router import api_router
 from app.api.v1.middleware.security import SecurityHeadersMiddleware, RequestIdMiddleware, limiter, _rate_limit_exceeded_handler, RateLimitExceeded
+from app.api.v1.middleware.access_log import AccessLogMiddleware
 import logging
 
 # Setup logging
@@ -41,6 +42,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(RequestIdMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(AccessLogMiddleware)
 
 # Global Exception Handlers
 @app.exception_handler(StarletteHTTPException)

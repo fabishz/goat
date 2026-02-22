@@ -60,5 +60,34 @@ class DebateArgumentService:
         db.refresh(argument)
         return argument
 
+    def vote_argument(
+        self,
+        db: Session,
+        debate_id: UUID,
+        argument_id: UUID,
+        direction: str,
+    ) -> DebateArgument:
+        argument = db.execute(
+            select(DebateArgument).where(
+                DebateArgument.id == argument_id,
+                DebateArgument.debate_id == debate_id,
+                DebateArgument.deleted_at.is_(None),
+            )
+        ).scalar_one_or_none()
+        if not argument:
+            raise ValueError("Argument not found")
+
+        if direction == "up":
+            argument.upvotes = (argument.upvotes or 0) + 1
+        elif direction == "down":
+            argument.downvotes = (argument.downvotes or 0) + 1
+        else:
+            raise ValueError("Invalid vote direction")
+
+        db.add(argument)
+        db.commit()
+        db.refresh(argument)
+        return argument
+
 
 debate_argument_service = DebateArgumentService()

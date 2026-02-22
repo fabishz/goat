@@ -1,5 +1,6 @@
 import logging
 import sys
+import json
 from contextvars import ContextVar
 import uuid
 
@@ -11,11 +12,20 @@ class RequestIdFilter(logging.Filter):
         record.request_id = request_id_var.get()
         return True
 
+class JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "ts": self.formatTime(record, datefmt="%Y-%m-%dT%H:%M:%S%z"),
+            "level": record.levelname,
+            "logger": record.name,
+            "request_id": getattr(record, "request_id", ""),
+            "message": record.getMessage(),
+        }
+        return json.dumps(payload, ensure_ascii=True)
+
 def setup_logging():
-    log_format = "%(asctime)s - %(name)s - %(levelname)s - [%(request_id)s] - %(message)s"
-    
     handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(logging.Formatter(log_format))
+    handler.setFormatter(JsonFormatter())
     handler.addFilter(RequestIdFilter())
     
     logging.basicConfig(
