@@ -9,16 +9,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/stores/app-store';
 
+import { toast } from 'sonner';
+
 export default function RegisterPage() {
     const { checkAuth } = useAppStore();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(null);
 
         const formData = new FormData(e.target as HTMLFormElement);
         const name = formData.get('name') as string;
@@ -26,7 +26,7 @@ export default function RegisterPage() {
         const password = formData.get('password') as string;
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
             const response = await fetch(`${apiUrl}/users/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -38,12 +38,21 @@ export default function RegisterPage() {
             });
 
             if (!response.ok) {
-                const data = await response.json();
-                // Handle Pydantic validation errors or direct detail strings
-                const errorMessage = Array.isArray(data.detail)
-                    ? data.detail[0].msg
-                    : (data.detail || 'Registration failed');
-                throw new Error(errorMessage);
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const data = await response.json();
+                    const errorMessage = Array.isArray(data.detail)
+                        ? data.detail[0].msg
+                        : (data.detail || 'Registration failed');
+                    throw new Error(errorMessage);
+                } else {
+                    const text = await response.text();
+                    console.error("Unexpected response:", text);
+                    if (response.status === 404) {
+                        throw new Error('API route not found. Check if backend is running.');
+                    }
+                    throw new Error('Server returned an invalid response. Please try again later.');
+                }
             }
 
             // Success - automatically login
@@ -56,12 +65,23 @@ export default function RegisterPage() {
                 }),
             });
 
-            const { access_token } = await loginRes.json();
+            if (!loginRes.ok) {
+                throw new Error('Account created, but automatic login failed. Please sign in manually.');
+            }
+
+            const data = await loginRes.json();
+            const { access_token } = data;
             localStorage.setItem('arena_token', access_token);
             await checkAuth();
+            toast.success('Account Created!', {
+                description: 'Welcome to the Arena, ' + name + '!',
+            });
             router.push('/dashboard');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Registration failed');
+            const message = err instanceof Error ? err.message : 'Registration failed';
+            toast.error('Registration Error', {
+                description: message,
+            });
             setIsLoading(false);
         }
     };
@@ -78,11 +98,6 @@ export default function RegisterPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-                {error && (
-                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-bold text-center">
-                        {error}
-                    </div>
-                )}
                 <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Full Name</label>
                     <div className="relative">

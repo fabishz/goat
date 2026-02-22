@@ -13,6 +13,8 @@ interface DebateDetailProps {
     debateId: string;
 }
 
+import { toast } from 'sonner';
+
 export function DebateDetail({ debateId }: DebateDetailProps) {
     const { data: debate, isLoading: debateLoading } = useDebate(debateId);
     const { data: argumentsList, isLoading: argumentsLoading } = useDebateArguments(debateId);
@@ -35,8 +37,15 @@ export function DebateDetail({ debateId }: DebateDetailProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!content.trim()) return;
-        await createArgument.mutateAsync({ content: content.trim(), type });
-        setContent('');
+        try {
+            await createArgument.mutateAsync({ content: content.trim(), type });
+            toast.success('Argument posted!', {
+                description: 'Your contribution has been added to the debate.',
+            });
+            setContent('');
+        } catch (err) {
+            // Error is already handled by axios interceptor
+        }
     };
 
     if (debateLoading) {
@@ -179,9 +188,9 @@ export function DebateDetail({ debateId }: DebateDetailProps) {
                                 <Button
                                     type="submit"
                                     className="w-full"
-                                    disabled={createArgument.isLoading}
+                                    disabled={createArgument.isPending}
                                 >
-                                    {createArgument.isLoading ? 'Posting...' : 'Post Argument'}
+                                    {createArgument.isPending ? 'Posting...' : 'Post Argument'}
                                 </Button>
                             </form>
                         </div>

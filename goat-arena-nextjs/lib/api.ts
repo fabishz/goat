@@ -9,18 +9,26 @@ export const api = axios.create({
     },
 });
 
+import { toast } from 'sonner';
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Use console.warn instead of console.error to avoid Next.js treating it as unhandled
         if (error.response) {
-            // Server responded with error status
+            const message = error.response.data?.detail || 'An unexpected error occurred';
+            toast.error('API Error', {
+                description: message,
+            });
             console.warn('API Error:', error.response.status, error.response.data);
         } else if (error.request) {
-            // Request made but no response (network error, CORS, etc.)
-            console.warn('Network Error: Unable to reach API server. Make sure backend is running.');
+            toast.error('Network Error', {
+                description: 'Unable to reach the server. Please check if the backend is running.',
+            });
+            console.warn('Network Error: Unable to reach API server.');
         } else {
-            // Something else happened
+            toast.error('Request Error', {
+                description: error.message,
+            });
             console.warn('Request Error:', error.message);
         }
         return Promise.reject(error);

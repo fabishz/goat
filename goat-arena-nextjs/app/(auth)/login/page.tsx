@@ -9,23 +9,23 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/stores/app-store';
 
+import { toast } from 'sonner';
+
 export default function LoginPage() {
     const { checkAuth } = useAppStore();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(null);
 
         const formData = new FormData(e.target as HTMLFormElement);
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
             const response = await fetch(`${apiUrl}/auth/login/access-token`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -36,19 +36,34 @@ export default function LoginPage() {
             });
 
             if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.detail || 'Login failed');
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const data = await response.json();
+                    throw new Error(data.detail || 'Login failed');
+                } else {
+                    const text = await response.text();
+                    console.error("Unexpected response:", text);
+                    if (response.status === 404) {
+                        throw new Error('API route not found. Check if backend is running.');
+                    }
+                    throw new Error('Server returned an invalid response. Please try again later.');
+                }
             }
 
-            const { access_token } = await response.json();
+            const data = await response.json();
+            const { access_token } = data;
 
-            // Temporary mapping for login success until checkAuth fetches full profile
-            // checkAuth will be called immediately after or logic could be centralized
             localStorage.setItem('arena_token', access_token);
             await checkAuth();
+            toast.success('Welcome to the Arena!', {
+                description: 'You have successfully logged in.',
+            });
             router.push('/dashboard');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Login failed');
+            const message = err instanceof Error ? err.message : 'Login failed';
+            toast.error('Authentication Error', {
+                description: message,
+            });
             setIsLoading(false);
         }
     };
@@ -65,11 +80,6 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-bold text-center">
-                        {error}
-                    </div>
-                )}
                 <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
                     <div className="relative">
