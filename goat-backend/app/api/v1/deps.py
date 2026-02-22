@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import Generator, List
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
@@ -17,7 +17,9 @@ reusable_oauth2 = OAuth2PasswordBearer(
 )
 
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
+    db: Session = Depends(get_db),
+    token: str = Depends(reusable_oauth2),
+    request: Request | None = None,
 ) -> User:
     try:
         payload = jwt.decode(
@@ -49,6 +51,8 @@ def get_current_user(
             detail="Account is temporarily locked. Please try again later.",
         )
 
+    if request is not None:
+        request.state.user_id = user.id
     return user
 
 def get_current_active_user(

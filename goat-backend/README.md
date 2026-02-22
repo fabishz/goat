@@ -83,6 +83,16 @@ The **GOAT (Greatest of All Time) Ranking Engine** is a sophisticated, mathemati
 ## API Documentation
 Once running, visit `http://localhost:8000/docs` for the interactive Swagger UI.
 
+## Outbound HTTP with Correlation IDs
+When making outbound HTTP calls, use the helper in `app/core/http.py` to automatically propagate `X-Request-ID` from the incoming request.
+
+```python
+from app.core.http import get_httpx_client, get_async_httpx_client
+
+with get_httpx_client() as client:
+    client.get("https://example.com")
+```
+
 ### Key Endpoints
 - **Scoring**: `/api/v1/scoring/run/{category_id}` - Calculate and retrieve rankings.
 - **Eras**: `/api/v1/eras` - Manage historical eras and context factors.

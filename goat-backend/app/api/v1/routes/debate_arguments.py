@@ -1,7 +1,7 @@
 from typing import List
 import logging
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.api.v1 import deps
@@ -9,6 +9,7 @@ from app.api.v1.middleware.security import limiter
 from app.models.user import User
 from app.schemas.debate_argument import DebateArgument, DebateArgumentCreate, DebateArgumentVote
 from app.services.debate_arguments import debate_argument_service
+from app.services.audit import AuditService
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -54,6 +55,7 @@ def vote_debate_argument(
     vote_in: DebateArgumentVote,
     db: Session = Depends(get_db),
     current_user: User = Depends(deps.get_current_user),
+    request: Request,
 ):
     try:
         logger.info(
@@ -63,8 +65,33 @@ def vote_debate_argument(
             current_user.id,
             vote_in.direction,
         )
-        return debate_argument_service.vote_argument(
+        argument = debate_argument_service.vote_argument(
             db, debate_id=debate_id, argument_id=argument_id, direction=vote_in.direction
         )
+        AuditService.log_from_request(
+            db,
+            "debate.argument.vote",
+            request,
+            user=current_user,
+            resource_type="debate_argument",
+            resource_id=argument_id,
+            detail={"debate_id": str(debate_id), "direction": vote_in.direction},
+            success=True,
+            http_status=200,
+        )
+        db.commit()
+        return argument
     except ValueError as exc:
+        AuditService.log_from_request(
+            db,
+            "debate.argument.vote",
+            request,
+            user=current_user,
+            resource_type="debate_argument",
+            resource_id=argument_id,
+            detail={"debate_id": str(debate_id), "direction": vote_in.direction},
+            success=False,
+            http_status=404,
+        )
+        db.commit()
         raise HTTPException(status_code=404, detail=str(exc))

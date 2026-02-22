@@ -29,6 +29,7 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
         token = request_id_var.set(request_id)
         try:
+            request.state.request_id = request_id
             response: Response = await call_next(request)
             response.headers["X-Request-ID"] = request_id
             return response
